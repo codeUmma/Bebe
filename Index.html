@@ -1,0 +1,2480 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>베베오디오</title>
+
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="베베오디오">
+  <meta name="theme-color" content="#F7F4EE">
+
+  <script>
+    (function() {
+      try {
+        const c = document.createElement('canvas');
+        c.width = 180;
+        c.height = 180;
+        const ctx = c.getContext('2d');
+        ctx.fillStyle = '#FDFBF7';
+        ctx.fillRect(0, 0, 180, 180);
+        ctx.fillStyle = '#FAF0DD';
+        if (ctx.roundRect) {
+          ctx.beginPath();
+          ctx.roundRect(14, 14, 152, 152, 36);
+          ctx.fill();
+        } else {
+          ctx.fillRect(14, 14, 152, 152);
+        }
+        ctx.font = '86px "Apple Color Emoji", "Segoe UI Emoji", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('🎶', 90, 93);
+
+        const iconUrl = c.toDataURL('image/png');
+        const appleIcon = document.createElement('link');
+        appleIcon.rel = 'apple-touch-icon';
+        appleIcon.href = iconUrl;
+        document.head.appendChild(appleIcon);
+
+        const fav = document.createElement('link');
+        fav.rel = 'icon';
+        fav.type = 'image/png';
+        fav.href = iconUrl;
+        document.head.appendChild(fav);
+      } catch(e) {}
+    })();
+  </script>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+
+  <style>
+    :root {
+      --bg-warm: #F7F4EE;
+      --paper-cream: #FCFAF6;
+      --paper-border: #E8E1D5;
+      --stack-shadow: #DFD7C8;
+    }
+
+    * {
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      -webkit-user-select: none;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+      background-color: var(--bg-warm);
+      color: #38312C;
+      height: 100dvh;
+      width: 100vw;
+      overflow: hidden;
+      letter-spacing: -0.02em;
+    }
+
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    .songbook-stage {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      border-radius: 1.5rem;
+    }
+
+    .songbook-stack-base {
+      position: absolute;
+      inset: 0;
+      border-radius: 1.5rem;
+      background: #EDE6DB;
+      box-shadow: 
+        1px 2px 0 var(--stack-shadow),
+        3px 4px 0 #D5CBB9,
+        0 12px 24px rgba(70, 50, 30, 0.08);
+      z-index: 1;
+    }
+
+    .songbook-sheet {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      background-color: var(--paper-cream);
+      border-radius: 1.5rem;
+      border: 1px solid var(--paper-border);
+      overflow: hidden;
+      will-change: transform, box-shadow;
+    }
+
+    .binder-ring-hole {
+      width: 8px;
+      height: 8px;
+      border-radius: 9999px;
+      background: #8A7E72;
+      box-shadow: inset 1px 1px 2px rgba(0,0,0,0.35), 0 0 0 2px #EDE7DC;
+    }
+
+    .sheet-slide-out-left {
+      animation: animSlideOutLeft 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    @keyframes animSlideOutLeft {
+      0% {
+        transform: translateX(0);
+        box-shadow: 2px 0 12px rgba(60, 45, 30, 0.06);
+      }
+      100% {
+        transform: translateX(-105%);
+        box-shadow: 20px 0 30px rgba(60, 45, 30, 0.16);
+      }
+    }
+
+    .sheet-slide-in-from-left {
+      animation: animSlideInLeft 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    @keyframes animSlideInLeft {
+      0% {
+        transform: translateX(-105%);
+        box-shadow: 20px 0 30px rgba(60, 45, 30, 0.16);
+      }
+      100% {
+        transform: translateX(0);
+        box-shadow: 2px 0 12px rgba(60, 45, 30, 0.06);
+      }
+    }
+
+    .soundbook-tile {
+      box-shadow: 0 3px 0 #D8D0C3, 0 5px 10px rgba(50, 40, 30, 0.04);
+      transition: transform 0.1s ease, box-shadow 0.1s ease;
+      touch-action: manipulation;
+      outline: none !important;
+    }
+    .soundbook-tile:active {
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 #D8D0C3;
+    }
+    .soundbook-tile.is-playing {
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 #D8D0C3 !important;
+      border-color: #D3C4AF !important;
+    }
+
+    .color-swatch {
+      position: relative;
+      transition: transform 0.1s ease;
+    }
+    .color-swatch:active {
+      transform: scale(0.92);
+    }
+
+    .time-timer-dial {
+      transition: background 0.25s linear;
+    }
+  </style>
+</head>
+<body class="flex flex-col justify-between items-center p-2.5 sm:p-4 max-w-lg mx-auto">
+
+  <header class="w-full flex items-center justify-between gap-1.5 pb-1 flex-shrink-0 z-20">
+    <div id="filter-chip-container" class="flex-1 flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1 pr-1"></div>
+
+    <div class="flex items-center gap-1 flex-shrink-0">
+      <button id="btn-shuffle" class="w-8 h-8 rounded-full bg-white/90 text-stone-700 shadow-sm border border-stone-200 flex items-center justify-center text-xs active:scale-95 transition-all">
+        <i class="fa-solid fa-shuffle"></i>
+      </button>
+      <button id="btn-repeat-mode" class="w-8 h-8 rounded-full bg-white/90 text-stone-700 shadow-sm border border-stone-200 flex items-center justify-center text-xs active:scale-95 transition-all relative">
+        <i id="repeat-icon" class="fa-solid fa-arrow-right text-[11px]"></i>
+        <span id="repeat-badge" class="hidden absolute -top-1 -right-1 bg-amber-500 text-white rounded-full text-[8px] font-black w-3.5 h-3.5 flex items-center justify-center">1</span>
+      </button>
+      <button id="btn-play-all" class="w-8 h-8 rounded-full bg-white/90 text-stone-700 shadow-sm border border-stone-200 flex items-center justify-center text-xs active:scale-95 transition-all">
+        <i class="fa-solid fa-play text-[11px] ml-0.5"></i>
+      </button>
+      <button id="btn-stop-all" class="w-8 h-8 rounded-full bg-white/90 text-stone-600 shadow-sm border border-stone-200 flex items-center justify-center text-xs active:scale-95 transition-all">
+        <i class="fa-solid fa-stop"></i>
+      </button>
+      <button id="btn-timer-quick" class="w-8 h-8 rounded-full bg-white/90 text-stone-700 shadow-sm border border-stone-200 flex items-center justify-center text-xs active:scale-95 transition-all relative">
+        <i class="fa-regular fa-clock text-[12px]"></i>
+        <span id="quick-timer-badge" class="hidden absolute -top-1 -right-1 bg-amber-500 text-white rounded-full text-[8px] font-black px-1 h-3.5 flex items-center justify-center"></span>
+      </button>
+      <button id="btn-open-settings" class="w-8 h-8 rounded-full bg-stone-200/70 text-stone-600 shadow-sm border border-stone-300/60 flex items-center justify-center text-xs active:scale-95 transition-all">
+        <i class="fa-solid fa-gear"></i>
+      </button>
+    </div>
+  </header>
+
+  <div id="quick-timer-popover" class="hidden absolute top-12 right-3 z-40 bg-white/95 backdrop-blur-md rounded-2xl shadow-xl border border-stone-200 p-3 w-64 space-y-2.5">
+    <div class="flex items-center justify-between">
+      <span class="text-xs font-bold text-stone-800 flex items-center gap-1.5">
+        <i class="fa-regular fa-clock text-amber-600"></i> <span id="ui-quick-timer-title">재생 타이머</span>
+      </span>
+      <span id="quick-timer-status" class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-stone-100 text-stone-600">꺼짐</span>
+    </div>
+    <div class="flex items-center gap-1.5">
+      <input type="number" id="input-quick-timer" min="0" max="180" placeholder="0"
+             class="flex-1 px-2.5 py-1 text-xs text-center rounded-lg border border-stone-200 bg-stone-50 font-bold text-stone-800 focus:outline-none focus:bg-white">
+      <span class="text-xs text-stone-600 font-medium">분</span>
+      <button id="btn-quick-timer-apply" class="px-2.5 py-1 bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300 rounded-lg text-xs font-bold active:scale-95 transition-all">설정</button>
+      <button id="btn-quick-timer-off" class="px-2 py-1 bg-stone-100 hover:bg-stone-200 text-stone-600 border border-stone-200 rounded-lg text-xs font-bold active:scale-95 transition-all">끄기</button>
+    </div>
+    <div class="grid grid-cols-4 gap-1">
+      <button type="button" class="btn-timer-chip py-1 text-[11px] font-bold rounded-lg border bg-stone-50 border-stone-200 text-stone-700 hover:bg-stone-100" data-min="5">5분</button>
+      <button type="button" class="btn-timer-chip py-1 text-[11px] font-bold rounded-lg border bg-stone-50 border-stone-200 text-stone-700 hover:bg-stone-100" data-min="10">10분</button>
+      <button type="button" class="btn-timer-chip py-1 text-[11px] font-bold rounded-lg border bg-stone-50 border-stone-200 text-stone-700 hover:bg-stone-100" data-min="15">15분</button>
+      <button type="button" class="btn-timer-chip py-1 text-[11px] font-bold rounded-lg border bg-stone-50 border-stone-200 text-stone-700 hover:bg-stone-100" data-min="30">30분</button>
+    </div>
+  </div>
+
+  <main class="w-full flex-1 flex flex-col items-center justify-center my-1 relative min-h-0">
+    <div id="book-stage" class="songbook-stage max-h-[78vh]">
+      <div class="songbook-stack-base"></div>
+
+      <div id="under-sheet" class="songbook-sheet flex items-stretch z-10">
+        <div class="w-6 sm:w-7 bg-[#F6F1E8] border-r border-dashed border-stone-300/60 flex flex-col justify-around items-center py-4 flex-shrink-0">
+          <div class="binder-ring-hole"></div>
+          <div class="binder-ring-hole"></div>
+          <div class="binder-ring-hole"></div>
+          <div class="binder-ring-hole"></div>
+        </div>
+        <div class="under-grid flex-1 grid grid-cols-2 grid-rows-3 gap-2 sm:gap-2.5 p-2 sm:p-2.5"></div>
+      </div>
+
+      <div id="active-sheet" class="songbook-sheet flex items-stretch z-20">
+        <div class="w-6 sm:w-7 bg-[#F6F1E8] border-r border-dashed border-stone-300/60 flex flex-col justify-around items-center py-4 flex-shrink-0">
+          <div class="binder-ring-hole"></div>
+          <div class="binder-ring-hole"></div>
+          <div class="binder-ring-hole"></div>
+          <div class="binder-ring-hole"></div>
+        </div>
+        <div id="active-grid" class="flex-1 grid grid-cols-2 grid-rows-3 gap-2 sm:gap-2.5 p-2 sm:p-2.5"></div>
+      </div>
+
+      <div id="visual-timer-container" class="hidden absolute inset-0 z-30 flex items-center justify-center pointer-events-none transition-opacity duration-300">
+        <div class="bg-white/90 backdrop-blur-md rounded-3xl p-4 shadow-2xl border border-stone-200/90 flex flex-col items-center justify-center gap-2 transform transition-transform">
+          <div class="text-[11px] font-extrabold text-stone-600 flex items-center gap-1">
+            <span>⏰</span>
+            <span id="visual-timer-label">곧 노래가 끝나요</span>
+          </div>
+          
+          <div class="relative w-32 h-32 rounded-full bg-stone-100 border-4 border-stone-200 flex items-center justify-center shadow-inner overflow-hidden">
+            <div class="absolute top-1 w-1 h-2 bg-stone-400 rounded-full z-10"></div>
+            <div id="visual-timer-disk" class="time-timer-dial absolute inset-0 rounded-full"></div>
+            <div class="relative z-10 w-14 h-14 rounded-full bg-white shadow-md flex flex-col items-center justify-center border border-stone-100">
+              <span id="visual-timer-seconds" class="text-base font-black text-rose-500">60</span>
+              <span class="text-[8px] font-bold text-stone-400 -mt-1">SEC</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="w-full flex flex-col items-center justify-center pt-0.5 pb-1 flex-shrink-0 z-20">
+    <div class="w-full flex items-center justify-between h-9 px-1">
+      <button id="btn-prev-page" class="w-9 h-9 rounded-2xl bg-white/95 shadow-sm text-stone-700 border border-stone-200 flex items-center justify-center text-sm active:scale-95 transition-all disabled:opacity-20 disabled:pointer-events-none">
+        <i class="fa-solid fa-chevron-left"></i>
+      </button>
+
+      <div class="flex items-center gap-2">
+        <div id="page-dots" class="flex items-center gap-1.5"></div>
+        <span id="page-text" class="text-xs font-bold text-stone-500 ml-1">1 / 1</span>
+      </div>
+
+      <button id="btn-next-page" class="w-9 h-9 rounded-2xl bg-white/95 shadow-sm text-stone-700 border border-stone-200 flex items-center justify-center text-sm active:scale-95 transition-all disabled:opacity-20 disabled:pointer-events-none">
+        <i class="fa-solid fa-chevron-right"></i>
+      </button>
+    </div>
+
+    <div class="mt-0.5 text-center">
+      <span id="ui-copyright" class="text-[10px] font-semibold text-stone-400 select-none">© 2026 엄마</span>
+    </div>
+  </footer>
+
+  <!-- 설정 모달 -->
+  <div id="parent-modal" class="fixed inset-0 bg-stone-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4 hidden">
+    <div class="bg-stone-50 rounded-2xl max-w-sm w-full max-h-[92vh] overflow-y-auto p-3.5 shadow-xl space-y-2.5 border border-stone-200 no-scrollbar">
+      
+      <div class="flex items-center justify-between border-b border-stone-200 pb-2">
+        <div class="flex items-center gap-2">
+          <h3 id="ui-settings-title" class="text-sm font-bold text-stone-800">설정</h3>
+          <div class="flex items-center bg-stone-200/80 rounded-lg p-0.5 border border-stone-300/60">
+            <button type="button" id="btn-ui-lang-ko" class="px-2 py-0.5 text-[10px] font-bold rounded bg-white text-stone-800 shadow-sm transition-all">KO</button>
+            <button type="button" id="btn-ui-lang-en" class="px-2 py-0.5 text-[10px] font-bold rounded text-stone-500 transition-all">EN</button>
+          </div>
+        </div>
+        <button id="btn-close-modal" class="w-6 h-6 rounded-lg bg-white text-stone-500 flex items-center justify-center shadow-sm border border-stone-200 active:scale-95">
+          <i class="fa-solid fa-xmark text-xs"></i>
+        </button>
+      </div>
+
+      <div class="bg-white p-2.5 rounded-xl border border-stone-200 space-y-2">
+        <div id="ui-label-new-item" class="text-xs font-bold text-stone-800">새 항목</div>
+
+        <div class="w-full">
+          <input type="text" id="new-title" placeholder="제목"
+                 class="w-full px-2.5 py-1.5 text-xs rounded-lg border border-stone-200 bg-stone-50 focus:outline-none focus:bg-white font-medium">
+        </div>
+
+        <div>
+          <div id="ui-label-select-cat" class="text-[11px] font-bold text-stone-600 mb-1">카테고리 선택</div>
+          <div id="add-modal-category-bubbles" class="flex flex-wrap gap-1 max-h-20 overflow-y-auto p-1 bg-stone-50 rounded-lg border border-stone-200/80 min-h-7">
+          </div>
+        </div>
+
+        <div>
+          <div class="grid grid-cols-2 gap-1 mb-1.5">
+            <button type="button" id="tab-cover-text" class="py-1 text-xs font-bold rounded-lg border bg-amber-50 border-amber-200 text-amber-900 flex items-center justify-center transition-colors">
+              색상 & 이모지
+            </button>
+            <button type="button" id="tab-cover-pic" class="py-1 text-xs font-bold rounded-lg border bg-stone-50 border-stone-200 text-stone-600 flex items-center justify-center transition-colors">
+              사진
+            </button>
+          </div>
+
+          <div id="panel-cover-pic" class="hidden">
+            <label class="flex items-center justify-center gap-2 w-full py-2.5 px-3 bg-stone-50 hover:bg-stone-100 border border-stone-300 border-dashed rounded-lg cursor-pointer text-xs font-semibold text-stone-700 active:scale-95 transition-all">
+              <i class="fa-solid fa-image text-stone-400"></i>
+              <span id="label-cover-filename" class="truncate max-w-[200px]">사진 선택 (앨범 / 파일)</span>
+              <input type="file" id="file-cover-input" accept="image/*,.jpg,.jpeg,.png,.webp,.gif,.heic,.heif" class="hidden">
+            </label>
+          </div>
+
+          <div id="panel-cover-text" class="space-y-1.5">
+            <div class="flex items-center gap-1.5 flex-wrap px-0.5">
+              <button type="button" class="color-swatch w-5 h-5 rounded-full border border-stone-200 shadow-sm" style="background-color: #FFE5E5;" data-hex="#FFE5E5"></button>
+              <button type="button" class="color-swatch w-5 h-5 rounded-full border border-stone-200 shadow-sm" style="background-color: #FFEBD9;" data-hex="#FFEBD9"></button>
+              <button type="button" class="color-swatch w-5 h-5 rounded-full border border-stone-300 shadow-sm ring-2 ring-stone-700" style="background-color: #FFF6D6;" data-hex="#FFF6D6"></button>
+              <button type="button" class="color-swatch w-5 h-5 rounded-full border border-stone-200 shadow-sm" style="background-color: #E8F8EC;" data-hex="#E8F8EC"></button>
+              <button type="button" class="color-swatch w-5 h-5 rounded-full border border-stone-200 shadow-sm" style="background-color: #E5F2FC;" data-hex="#E5F2FC"></button>
+              <button type="button" class="color-swatch w-5 h-5 rounded-full border border-stone-200 shadow-sm" style="background-color: #EAE8FB;" data-hex="#EAE8FB"></button>
+              <button type="button" class="color-swatch w-5 h-5 rounded-full border border-stone-200 shadow-sm" style="background-color: #F3E8FA;" data-hex="#F3E8FA"></button>
+              <button type="button" class="color-swatch w-5 h-5 rounded-full border border-stone-200 shadow-sm" style="background-color: #FFE8F0;" data-hex="#FFE8F0"></button>
+
+              <label class="w-5 h-5 rounded-full border border-stone-300 shadow-sm cursor-pointer flex items-center justify-center bg-white relative overflow-hidden active:scale-95 ml-0.5">
+                <i class="fa-solid fa-eye-dropper text-[9px] text-stone-500"></i>
+                <input type="color" id="custom-color-picker" value="#FFF6D6" class="absolute -top-4 -left-4 w-12 h-12 opacity-0 cursor-pointer">
+              </label>
+              <input type="hidden" id="selected-tile-hex" value="#FFF6D6">
+            </div>
+
+            <input type="text" id="selected-card-icon" value="🌟" placeholder="이모지 직접 입력"
+                   class="w-full px-2 py-1 text-center text-base rounded-lg border border-stone-200 bg-stone-50 font-bold focus:outline-none focus:bg-white">
+          </div>
+
+          <div class="flex items-center justify-center pt-2">
+            <div id="tile-preview-box" class="w-16 h-16 rounded-xl border border-stone-200 shadow-sm overflow-hidden flex flex-col items-center justify-center p-1 relative transition-all" style="background-color: #FFF6D6;">
+              <div id="preview-text-content" class="flex flex-col items-center justify-center w-full h-full">
+                <span id="tile-preview-icon" class="text-2xl pointer-events-none">🌟</span>
+                <span id="tile-preview-text" class="text-[9px] font-bold text-stone-800 text-center truncate max-w-full mt-0.5">미리보기</span>
+              </div>
+              <img id="preview-img-content" src="" alt="미리보기" class="hidden w-full h-full object-cover rounded-lg pointer-events-none">
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="grid grid-cols-3 gap-1 mb-1.5">
+            <button type="button" id="tab-src-file" class="py-1 text-[11px] font-bold rounded-lg border bg-stone-100 border-stone-200 text-stone-800 flex items-center justify-center transition-colors">
+              파일
+            </button>
+            <button type="button" id="tab-src-yt" class="py-1 text-[11px] font-bold rounded-lg border bg-stone-50 border-stone-200 text-stone-600 flex items-center justify-center transition-colors">
+              유튜브
+            </button>
+            <button type="button" id="tab-src-url" class="py-1 text-[11px] font-bold rounded-lg border bg-stone-50 border-stone-200 text-stone-600 flex items-center justify-center transition-colors">
+              링크
+            </button>
+          </div>
+
+          <div id="panel-src-file">
+            <label class="flex items-center justify-center gap-2 w-full py-2.5 px-3 bg-stone-50 hover:bg-stone-100 border border-stone-300 border-dashed rounded-lg cursor-pointer text-xs font-semibold text-stone-700 active:scale-95 transition-all">
+              <i class="fa-solid fa-music text-stone-400"></i>
+              <span id="label-audio-filename" class="truncate max-w-[200px]">음원 파일 선택 (MP3, M4A 등)</span>
+              <input type="file" id="file-audio-input" accept=".mp3,.m4a,.wav,.aac,.flac,.ogg,audio/*" class="hidden">
+            </label>
+          </div>
+
+          <div id="panel-src-yt" class="hidden">
+            <input type="text" id="input-yt-url" placeholder="유튜브 링크"
+                   class="w-full px-2 py-1.5 text-xs rounded-lg border border-stone-200 bg-stone-50 focus:outline-none font-medium">
+          </div>
+
+          <div id="panel-src-url" class="hidden">
+            <input type="text" id="input-stream-url" placeholder="음원 주소"
+                   class="w-full px-2 py-1.5 text-xs rounded-lg border border-stone-200 bg-stone-50 focus:outline-none font-medium">
+          </div>
+        </div>
+
+        <button id="btn-submit-card" class="w-full py-1.5 rounded-lg bg-[#EFE8DC] hover:bg-[#E5DDCF] active:scale-95 text-stone-800 font-bold text-xs border border-[#DFD6C7] transition-all flex items-center justify-center gap-1">
+          <i class="fa-solid fa-plus text-xs"></i> <span id="ui-btn-add">추가</span>
+        </button>
+      </div>
+
+      <div class="bg-white p-2.5 rounded-xl border border-stone-200 space-y-2">
+        <div id="ui-label-category" class="font-bold text-xs text-stone-800">카테고리</div>
+
+        <div class="grid grid-cols-[44px_1fr_52px] gap-1.5 w-full items-center">
+          <input type="text" id="new-cat-emoji" placeholder="이모지" maxlength="4"
+                 class="w-full px-1 py-1.5 text-xs text-center rounded-lg border border-stone-200 bg-stone-50 focus:outline-none font-bold">
+          <input type="text" id="new-cat-name" placeholder="이름"
+                 class="w-full min-w-0 px-2 py-1.5 text-xs rounded-lg border border-stone-200 bg-stone-50 focus:outline-none font-medium">
+          <button id="btn-add-category" type="button" class="w-full py-1.5 rounded-lg bg-stone-100 hover:bg-stone-200 font-bold text-xs text-stone-800 border border-stone-200 active:scale-95 text-center">
+            등록
+          </button>
+        </div>
+
+        <div id="modal-category-tags" class="flex flex-wrap gap-1 pt-0.5 max-h-20 overflow-y-auto"></div>
+      </div>
+
+      <div class="bg-white p-2.5 rounded-xl border border-stone-200 space-y-1.5">
+        <div class="flex justify-between items-center">
+          <span id="ui-label-list" class="font-bold text-xs text-stone-800">목록</span>
+          <span id="total-count-badge" class="text-[11px] px-1.5 py-0.5 rounded bg-stone-100 text-stone-700 font-bold">0</span>
+        </div>
+
+        <div class="flex gap-1.5">
+          <div class="relative flex-1 min-w-0">
+            <i class="fa-solid fa-magnifying-glass absolute left-2 top-2 text-[10px] text-stone-400"></i>
+            <input type="text" id="modal-search-input" placeholder="검색"
+                   class="w-full pl-6 pr-2 py-1 text-xs rounded-lg border border-stone-200 bg-stone-50 focus:outline-none font-medium">
+          </div>
+          <select id="modal-category-filter" class="w-20 px-1 py-1 text-xs rounded-lg border border-stone-200 bg-stone-50 focus:outline-none font-bold text-stone-700 flex-shrink-0">
+          </select>
+        </div>
+
+        <div id="modal-card-list" class="max-h-44 overflow-y-auto space-y-1.5 pr-0.5"></div>
+      </div>
+
+      <div class="bg-white p-2.5 rounded-xl border border-stone-200 space-y-1.5">
+        <div id="ui-label-bundle" class="text-xs font-bold text-stone-800">서재 보따리</div>
+        <div class="grid grid-cols-2 gap-1.5">
+          <button id="btn-export-bundle" class="py-1.5 rounded-lg bg-stone-100 hover:bg-stone-200 active:scale-95 text-stone-800 font-bold text-xs border border-stone-200 transition-all flex items-center justify-center gap-1">
+            내보내기
+          </button>
+          <label class="py-1.5 rounded-lg bg-stone-100 hover:bg-stone-200 active:scale-95 text-stone-800 font-bold text-xs border border-stone-200 transition-all flex items-center justify-center gap-1 cursor-pointer text-center">
+            <span id="ui-btn-import">불러오기</span>
+            <input type="file" id="input-import-bundle" accept=".json" class="hidden">
+          </label>
+        </div>
+      </div>
+
+      <div class="bg-white p-2.5 rounded-xl border border-stone-200 space-y-2">
+        <div class="flex justify-between items-center">
+          <span id="ui-label-timer" class="text-xs font-bold text-stone-800">재생 타이머</span>
+          <span id="timer-status-badge" class="text-[10px] text-stone-600 font-bold bg-stone-100 px-1.5 py-0.5 rounded">꺼짐</span>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <input type="number" id="input-custom-timer" min="0" max="180" placeholder="0"
+                 class="w-20 px-2 py-1 text-xs text-center rounded-lg border border-stone-200 bg-stone-50 font-bold text-stone-800 focus:outline-none focus:bg-white">
+          <span class="text-xs text-stone-600 font-medium">분 후 정지 (0 = 무제한)</span>
+        </div>
+
+        <div class="flex justify-between items-center pt-1.5 border-t border-stone-100">
+          <span id="ui-label-repeat-limit" class="text-xs font-bold text-stone-800">한 곡 반복 횟수</span>
+          <span id="repeat-limit-badge" class="text-[10px] text-stone-700 font-bold bg-stone-100 px-1.5 py-0.5 rounded">무제한</span>
+        </div>
+        <div class="grid grid-cols-4 gap-1">
+          <button type="button" class="btn-repeat-limit-opt py-1 text-[11px] font-bold rounded-lg border bg-stone-100 border-stone-300 text-stone-800" data-count="0">무제한</button>
+          <button type="button" class="btn-repeat-limit-opt py-1 text-[11px] font-bold rounded-lg border bg-stone-50 border-stone-200 text-stone-600" data-count="3">3회</button>
+          <button type="button" class="btn-repeat-limit-opt py-1 text-[11px] font-bold rounded-lg border bg-stone-50 border-stone-200 text-stone-600" data-count="5">5회</button>
+          <button type="button" class="btn-repeat-limit-opt py-1 text-[11px] font-bold rounded-lg border bg-stone-50 border-stone-200 text-stone-600" data-count="10">10회</button>
+        </div>
+      </div>
+
+      <div class="bg-white p-2.5 rounded-xl border border-stone-200">
+        <div class="flex justify-between items-center mb-0.5">
+          <span id="ui-label-cooldown" class="text-xs font-bold text-stone-800">연타 방지</span>
+          <span id="cooldown-val" class="text-stone-800 font-bold text-xs bg-stone-100 px-1.5 py-0.5 rounded">6초</span>
+        </div>
+        <input type="range" id="input-cooldown" min="3" max="25" value="6" class="w-full accent-stone-600 cursor-pointer h-1.5 my-1">
+      </div>
+
+      <div class="bg-stone-100/90 p-2 rounded-xl border border-stone-200 flex items-center gap-1.5">
+        <input type="text" id="family-sync-key" placeholder="패밀리 코드"
+               class="flex-1 min-w-0 px-2 py-1 text-xs rounded-lg border border-stone-200 bg-white font-bold text-stone-800 focus:outline-none">
+        <button id="btn-save-family-key" class="px-2.5 py-1 rounded-lg bg-stone-200 hover:bg-stone-300 active:scale-95 text-stone-800 font-bold text-xs border border-stone-300 flex-shrink-0">
+          연결
+        </button>
+      </div>
+
+      <div class="flex items-center justify-between pt-0.5">
+        <button id="btn-reset-preset" class="text-xs text-stone-400 hover:text-stone-600 underline font-semibold transition-colors">
+          전체 비우기
+        </button>
+        <button id="btn-finish-modal" class="px-4 py-1.5 rounded-lg bg-stone-700 text-white text-xs font-bold shadow-sm active:scale-95 transition-transform">
+          완료
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <audio id="local-audio-player" class="hidden" preload="auto"></audio>
+  <div id="yt-player-container" class="hidden pointer-events-none w-1 h-1 overflow-hidden opacity-0">
+    <div id="yt-player-slot"></div>
+  </div>
+
+  <script>
+    const I18N = {
+      ko: {
+        settingsTitle: '설정',
+        newItem: '새 항목',
+        titlePlaceholder: '제목',
+        tabCoverText: '색상 & 이모지',
+        tabCoverPic: '사진',
+        tabFile: '파일',
+        tabYt: '유튜브',
+        tabUrl: '링크',
+        inputYtPlaceholder: '유튜브 링크',
+        inputStreamPlaceholder: '음원 주소',
+        addBtn: '추가',
+        categoryTitle: '카테고리',
+        categorySelectTitle: '카테고리 선택',
+        catEmojiPlaceholder: '이모지',
+        catNamePlaceholder: '이름',
+        catAddBtn: '등록',
+        noCategories: '카테고리를 등록해 보세요',
+        listTitle: '목록',
+        searchPlaceholder: '검색',
+        emptyList: '비어 있음',
+        bundleTitle: '서재 보따리',
+        exportBtn: '내보내기',
+        importBtn: '불러오기',
+        timerTitle: '재생 타이머',
+        timerOff: '꺼짐',
+        timerUnit: '분',
+        repeatCountTitle: '한 곡 반복 횟수',
+        unlimited: '무제한',
+        countUnit: '회',
+        cooldownTitle: '연타 방지',
+        cooldownSuffix: '초',
+        familyKeyPlaceholder: '패밀리 코드',
+        familyKeyBtn: '연결',
+        resetBtn: '전체 비우기',
+        resetConfirm: '정말 비울까요? 한 번 더 터치',
+        doneBtn: '완료',
+        previewText: '미리보기',
+        inputEmojiPlaceholder: '이모지 직접 입력',
+        copyright: '© 2026 엄마',
+        allFilterName: '전체',
+        selectPhoto: '사진 선택 (앨범 / 파일)',
+        selectAudio: '음원 파일 선택 (MP3, M4A 등)',
+        visualTimerLabel: '곧 노래가 끝나요',
+        audioAlbumName: '베베오디오'
+      },
+      en: {
+        settingsTitle: 'Settings',
+        newItem: 'New Item',
+        titlePlaceholder: 'Title',
+        tabCoverText: 'Color & Emoji',
+        tabCoverPic: 'Photo',
+        tabFile: 'File',
+        tabYt: 'YouTube',
+        tabUrl: 'Link',
+        inputYtPlaceholder: 'YouTube link',
+        inputStreamPlaceholder: 'Audio link',
+        addBtn: 'Add',
+        categoryTitle: 'Categories',
+        categorySelectTitle: 'Select Categories',
+        catEmojiPlaceholder: 'Emoji',
+        catNamePlaceholder: 'Name',
+        catAddBtn: 'Add',
+        noCategories: 'Add a category',
+        listTitle: 'List',
+        searchPlaceholder: 'Search',
+        emptyList: 'Empty',
+        bundleTitle: 'Library Bundle',
+        exportBtn: 'Export',
+        importBtn: 'Import',
+        timerTitle: 'Sleep Timer',
+        timerOff: 'Off',
+        timerUnit: 'm',
+        repeatCountTitle: 'Repeat Count',
+        unlimited: 'Unlimited',
+        countUnit: 'times',
+        cooldownTitle: 'Tap Cooldown',
+        cooldownSuffix: 's',
+        familyKeyPlaceholder: 'Family Code',
+        familyKeyBtn: 'Connect',
+        resetBtn: 'Reset All',
+        resetConfirm: 'Tap again to confirm reset',
+        doneBtn: 'Done',
+        previewText: 'Preview',
+        inputEmojiPlaceholder: 'Enter emoji',
+        copyright: '© 2026 Mom',
+        allFilterName: 'All',
+        selectPhoto: 'Select Photo (Photos / Files)',
+        selectAudio: 'Select Audio File (MP3, M4A, etc.)',
+        visualTimerLabel: 'Music ending soon',
+        audioAlbumName: 'BebeAudio'
+      }
+    };
+
+    const DEFAULT_CATEGORIES = [
+      { id: 'all', icon: '🌈', name: '전체', type: 'system' }
+    ];
+
+    let currentUiLang = 'ko';
+    let cards = [];
+    let categories = JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
+    const CARDS_PER_PAGE = 6;
+    let currentPage = 1;
+    let isPageFlipping = false;
+    let activeFilter = 'all';
+
+    let currentPlaying = null;
+    let playingStartTime = 0;
+    let repeatMode = 'off'; // 'off' | 'one' | 'all'
+    let repeatCountLimit = 0;
+    let currentRepeatCount = 0;
+    let isShuffleActive = false;
+    let playbackMode = 'single';
+    let currentPlaylist = [];
+    let currentPlaylistIndex = 0;
+
+    let cooldownSec = 6;
+    let timerMinutes = 0;
+    let timerTimeoutId = null;
+    let timerEndTime = null;
+    let timerIntervalId = null;
+
+    let selectedAddCategoryIds = [];
+    let modalSearchTerm = '';
+    let modalFilterCategory = 'all';
+    let resetConfirmPending = false;
+
+    let audioCtx = null;
+    let synthTimer = null;
+    const localAudio = document.getElementById('local-audio-player');
+    let isYtReady = false;
+    let ytPlayer = null;
+
+    function generateEmojiArtworkDataUrl(emoji, hexColor) {
+      try {
+        const canvas = document.createElement('canvas');
+        canvas.width = 512;
+        canvas.height = 512;
+        const ctx = canvas.getContext('2d');
+
+        ctx.fillStyle = hexColor || '#FFF6D6';
+        ctx.fillRect(0, 0, 512, 512);
+
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
+        if (ctx.roundRect) {
+          ctx.beginPath();
+          ctx.roundRect(32, 32, 448, 448, 80);
+          ctx.fill();
+        }
+
+        ctx.font = '220px "Apple Color Emoji", "Segoe UI Emoji", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(emoji || '🌟', 256, 270);
+
+        return canvas.toDataURL('image/png');
+      } catch(e) {
+        return '';
+      }
+    }
+
+    function updateMediaSessionInfo(card) {
+      if (!('mediaSession' in navigator)) return;
+
+      if (!card) {
+        navigator.mediaSession.metadata = null;
+        navigator.mediaSession.playbackState = 'none';
+        return;
+      }
+
+      const t = I18N[currentUiLang] || I18N.ko;
+      let artworkUrl = '';
+
+      if (card.coverType === 'image' && card.coverUrl) {
+        artworkUrl = card.coverUrl;
+      } else {
+        artworkUrl = generateEmojiArtworkDataUrl(card.icon, card.bgColorHex);
+      }
+
+      const artworkList = [];
+      if (artworkUrl) {
+        artworkList.push(
+          { src: artworkUrl, sizes: '512x512', type: 'image/png' },
+          { src: artworkUrl, sizes: '256x256', type: 'image/png' },
+          { src: artworkUrl, sizes: '128x128', type: 'image/png' }
+        );
+      }
+
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: card.title || '베베오디오',
+        artist: '엄마의 사운드북',
+        album: t.audioAlbumName,
+        artwork: artworkList
+      });
+
+      navigator.mediaSession.playbackState = 'playing';
+
+      navigator.mediaSession.setActionHandler('play', () => {
+        if (localAudio.src) {
+          localAudio.play();
+          navigator.mediaSession.playbackState = 'playing';
+        }
+      });
+
+      navigator.mediaSession.setActionHandler('pause', () => {
+        localAudio.pause();
+        navigator.mediaSession.playbackState = 'paused';
+      });
+
+      navigator.mediaSession.setActionHandler('stop', () => {
+        stopPlayback(true);
+      });
+
+      navigator.mediaSession.setActionHandler('nexttrack', () => {
+        playNextInPlaylist();
+      });
+
+      navigator.mediaSession.setActionHandler('previoustrack', () => {
+        if (currentPlaylist.length > 0) {
+          currentPlaylistIndex = (currentPlaylistIndex - 1 + currentPlaylist.length) % currentPlaylist.length;
+          playSong(currentPlaylist[currentPlaylistIndex]);
+        }
+      });
+    }
+
+    function initAudioContext() {
+      if (!audioCtx) {
+        const AudioCtxClass = window.AudioContext || window.webkitAudioContext;
+        if (AudioCtxClass) {
+          audioCtx = new AudioCtxClass();
+        }
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    let db = null;
+    const audioBlobCache = new Map();
+    let familySyncKey = '';
+    let cloudPollInterval = null;
+
+    let currentCoverType = 'text';
+    let currentCoverPhotoDataUrl = '';
+    let currentAudioSourceType = 'file';
+
+    function initDB() {
+      return new Promise((resolve) => {
+        const request = indexedDB.open('BabySoundDB', 1);
+        request.onupgradeneeded = (e) => {
+          const database = e.target.result;
+          if (!database.objectStoreNames.contains('audioFiles')) {
+            database.createObjectStore('audioFiles', { keyPath: 'id' });
+          }
+        };
+        request.onsuccess = (e) => {
+          db = e.target.result;
+          resolve(db);
+        };
+        request.onerror = () => resolve(null);
+      });
+    }
+
+    function saveAudioToDB(id, blob) {
+      if (!db) return Promise.resolve();
+      return new Promise((resolve) => {
+        const tx = db.transaction('audioFiles', 'readwrite');
+        const store = tx.objectStore('audioFiles');
+        store.put({ id, blob });
+        tx.oncomplete = () => {
+          audioBlobCache.set(id, URL.createObjectURL(blob));
+          resolve();
+        };
+        tx.onerror = () => resolve();
+      });
+    }
+
+    function getAudioFromDB(id) {
+      if (!db) return Promise.resolve(null);
+      return new Promise((resolve) => {
+        const tx = db.transaction('audioFiles', 'readonly');
+        const store = tx.objectStore('audioFiles');
+        const request = store.get(id);
+        request.onsuccess = () => resolve(request.result ? request.result.blob : null);
+        request.onerror = () => resolve(null);
+      });
+    }
+
+    function deleteAudioFromDB(id) {
+      if (audioBlobCache.has(id)) {
+        try { URL.revokeObjectURL(audioBlobCache.get(id)); } catch(e){}
+        audioBlobCache.delete(id);
+      }
+      if (!db) return Promise.resolve();
+      return new Promise((resolve) => {
+        const tx = db.transaction('audioFiles', 'readwrite');
+        const store = tx.objectStore('audioFiles');
+        store.delete(id);
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => resolve();
+      });
+    }
+
+    async function preloadAllAudioBlobs() {
+      for (const card of cards) {
+        if (card.audioType === 'file' && !audioBlobCache.has(card.id)) {
+          const blob = await getAudioFromDB(card.id);
+          if (blob) {
+            audioBlobCache.set(card.id, URL.createObjectURL(blob));
+          }
+        }
+      }
+    }
+
+    function blobToBase64(blob) {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result);
+        reader.onerror = () => resolve('');
+        reader.readAsDataURL(blob);
+      });
+    }
+
+    function base64ToBlob(base64Data) {
+      const parts = base64Data.split(';base64,');
+      const contentType = parts[0].split(':')[1];
+      const raw = window.atob(parts[1]);
+      const rawLength = raw.length;
+      const uInt8Array = new Uint8Array(rawLength);
+      for (let i = 0; i < rawLength; ++i) {
+        uInt8Array[i] = raw.charCodeAt(i);
+      }
+      return new Blob([uInt8Array], { type: contentType });
+    }
+
+    function readFileAsDataUrl(file) {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (e) => resolve(e.target.result);
+        reader.onerror = () => resolve('');
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function setUiLanguage(lang) {
+      currentUiLang = (lang === 'en') ? 'en' : 'ko';
+      localStorage.setItem('baby_ui_lang', currentUiLang);
+
+      const t = I18N[currentUiLang];
+
+      document.getElementById('ui-settings-title').textContent = t.settingsTitle;
+      document.getElementById('ui-label-new-item').textContent = t.newItem;
+      document.getElementById('new-title').placeholder = t.titlePlaceholder;
+      document.getElementById('tab-cover-text').textContent = t.tabCoverText;
+      document.getElementById('tab-cover-pic').textContent = t.tabCoverPic;
+      document.getElementById('selected-card-icon').placeholder = t.inputEmojiPlaceholder;
+      document.getElementById('tile-preview-text').textContent = t.previewText;
+      document.getElementById('tab-src-file').textContent = t.tabFile;
+      document.getElementById('tab-src-yt').textContent = t.tabYt;
+      document.getElementById('tab-src-url').textContent = t.tabUrl;
+      document.getElementById('input-yt-url').placeholder = t.inputYtPlaceholder;
+      document.getElementById('input-stream-url').placeholder = t.inputStreamPlaceholder;
+      document.getElementById('ui-btn-add').textContent = t.addBtn;
+      document.getElementById('ui-label-category').textContent = t.categoryTitle;
+      document.getElementById('ui-label-select-cat').textContent = t.categorySelectTitle;
+      document.getElementById('new-cat-emoji').placeholder = t.catEmojiPlaceholder;
+      document.getElementById('new-cat-name').placeholder = t.catNamePlaceholder;
+      document.getElementById('btn-add-category').textContent = t.catAddBtn;
+      document.getElementById('ui-label-list').textContent = t.listTitle;
+      document.getElementById('modal-search-input').placeholder = t.searchPlaceholder;
+      document.getElementById('ui-label-bundle').textContent = t.bundleTitle;
+      document.getElementById('btn-export-bundle').textContent = t.exportBtn;
+      document.getElementById('ui-btn-import').textContent = t.importBtn;
+      document.getElementById('ui-label-timer').textContent = t.timerTitle;
+      document.getElementById('ui-quick-timer-title').textContent = t.timerTitle;
+      document.getElementById('ui-label-repeat-limit').textContent = t.repeatCountTitle;
+      document.getElementById('ui-label-cooldown').textContent = t.cooldownTitle;
+      document.getElementById('cooldown-val').textContent = `${cooldownSec}${t.cooldownSuffix}`;
+      document.getElementById('family-sync-key').placeholder = t.familyKeyPlaceholder;
+      document.getElementById('btn-save-family-key').textContent = t.familyKeyBtn;
+      document.getElementById('btn-reset-preset').textContent = t.resetBtn;
+      document.getElementById('btn-finish-modal').textContent = t.doneBtn;
+      document.getElementById('ui-copyright').textContent = t.copyright;
+
+      updateTimerUI();
+      updateRepeatLimitUI();
+
+      const audioLbl = document.getElementById('label-audio-filename');
+      const audioInput = document.getElementById('file-audio-input');
+      if (audioLbl && (!audioInput.files || !audioInput.files.length)) {
+        audioLbl.textContent = t.selectAudio;
+      }
+
+      const coverLbl = document.getElementById('label-cover-filename');
+      const coverInput = document.getElementById('file-cover-input');
+      if (coverLbl && (!coverInput.files || !coverInput.files.length)) {
+        coverLbl.textContent = t.selectPhoto;
+      }
+
+      const btnKo = document.getElementById('btn-ui-lang-ko');
+      const btnEn = document.getElementById('btn-ui-lang-en');
+      if (currentUiLang === 'ko') {
+        btnKo.className = 'px-2 py-0.5 text-[10px] font-bold rounded bg-white text-stone-800 shadow-sm transition-all';
+        btnEn.className = 'px-2 py-0.5 text-[10px] font-bold rounded text-stone-500 transition-all';
+      } else {
+        btnEn.className = 'px-2 py-0.5 text-[10px] font-bold rounded bg-white text-stone-800 shadow-sm transition-all';
+        btnKo.className = 'px-2 py-0.5 text-[10px] font-bold rounded text-stone-500 transition-all';
+      }
+
+      renderAddModalCategoryBubbles();
+      updateCategorySelectOptions();
+      renderModalCardList();
+      renderModalCategoryTags();
+      renderFilterChips();
+    }
+
+    document.getElementById('btn-ui-lang-ko').addEventListener('click', () => setUiLanguage('ko'));
+    document.getElementById('btn-ui-lang-en').addEventListener('click', () => setUiLanguage('en'));
+
+    const quickTimerPopover = document.getElementById('quick-timer-popover');
+    const btnTimerQuick = document.getElementById('btn-timer-quick');
+    const inputQuickTimer = document.getElementById('input-quick-timer');
+
+    btnTimerQuick.addEventListener('click', (e) => {
+      e.stopPropagation();
+      quickTimerPopover.classList.toggle('hidden');
+      if (!quickTimerPopover.classList.contains('hidden')) {
+        inputQuickTimer.value = timerMinutes > 0 ? timerMinutes : '';
+        inputQuickTimer.focus();
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!quickTimerPopover.contains(e.target) && e.target !== btnTimerQuick && !btnTimerQuick.contains(e.target)) {
+        quickTimerPopover.classList.add('hidden');
+      }
+    });
+
+    document.getElementById('btn-quick-timer-apply').addEventListener('click', () => {
+      const val = parseInt(inputQuickTimer.value, 10);
+      setTimerMinutes(isNaN(val) || val < 0 ? 0 : val);
+      quickTimerPopover.classList.add('hidden');
+    });
+
+    document.getElementById('btn-quick-timer-off').addEventListener('click', () => {
+      setTimerMinutes(0);
+      quickTimerPopover.classList.add('hidden');
+    });
+
+    document.querySelectorAll('.btn-timer-chip').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const val = parseInt(btn.dataset.min, 10);
+        setTimerMinutes(val);
+        quickTimerPopover.classList.add('hidden');
+      });
+    });
+
+    function setTimerMinutes(mins) {
+      timerMinutes = mins;
+      if (timerTimeoutId) {
+        clearTimeout(timerTimeoutId);
+        timerTimeoutId = null;
+      }
+      if (timerIntervalId) {
+        clearInterval(timerIntervalId);
+        timerIntervalId = null;
+      }
+
+      if (timerMinutes > 0) {
+        timerEndTime = Date.now() + timerMinutes * 60 * 1000;
+        timerIntervalId = setInterval(tickTimer, 1000);
+        timerTimeoutId = setTimeout(() => {
+          stopPlayback(true);
+        }, timerMinutes * 60 * 1000);
+      } else {
+        timerEndTime = null;
+      }
+      updateTimerUI();
+    }
+
+    function tickTimer() {
+      if (!timerEndTime) return;
+      const remainingMs = timerEndTime - Date.now();
+      if (remainingMs <= 0) {
+        if (timerIntervalId) clearInterval(timerIntervalId);
+        timerIntervalId = null;
+        timerEndTime = null;
+        timerMinutes = 0;
+        hideVisualTimer();
+        updateTimerUI();
+      } else {
+        updateTimerUI();
+        updateVisualTimer(remainingMs);
+      }
+    }
+
+    function updateVisualTimer(remainingMs) {
+      const container = document.getElementById('visual-timer-container');
+      const disk = document.getElementById('visual-timer-disk');
+      const secondsLabel = document.getElementById('visual-timer-seconds');
+      const textLabel = document.getElementById('visual-timer-label');
+      
+      const remainingSec = Math.max(0, Math.ceil(remainingMs / 1000));
+
+      if (remainingSec <= 60 && remainingSec > 0) {
+        container.classList.remove('hidden');
+        secondsLabel.textContent = remainingSec;
+        if (textLabel) {
+          textLabel.textContent = currentUiLang === 'en' ? 'Music ending soon' : '곧 노래가 끝나요';
+        }
+
+        const angle = (remainingSec / 60) * 360;
+        disk.style.background = `conic-gradient(from 0deg, #F87171 0deg, #EF4444 ${angle}deg, transparent ${angle}deg 360deg)`;
+      } else {
+        hideVisualTimer();
+      }
+    }
+
+    function hideVisualTimer() {
+      const container = document.getElementById('visual-timer-container');
+      if (container) {
+        container.classList.add('hidden');
+      }
+    }
+
+    const NOTE_FREQ = {
+      C4: 261.63, D4: 293.66, E4: 329.63, F4: 349.23, G4: 392.00, A4: 440.00, B4: 493.88,
+      C5: 523.25, D5: 587.33, E5: 659.25, F5: 698.46, G5: 783.99, A5: 880.00
+    };
+
+    const MELODIES = {
+      twinkle: [
+        { n: 'C4', d: 0.4 }, { n: 'C4', d: 0.4 }, { n: 'G4', d: 0.4 }, { n: 'G4', d: 0.4 },
+        { n: 'A4', d: 0.4 }, { n: 'A4', d: 0.4 }, { n: 'G4', d: 0.8 }
+      ]
+    };
+
+    function playSynthMelody(key, onComplete) {
+      initAudioContext();
+      stopSynth();
+
+      const notes = MELODIES.twinkle;
+      let noteIndex = 0;
+
+      function playNext() {
+        if (!currentPlaying) return;
+        if (noteIndex >= notes.length) {
+          if (onComplete) onComplete();
+          return;
+        }
+
+        const item = notes[noteIndex++];
+        const freq = NOTE_FREQ[item.n] || 440;
+        const duration = item.d;
+
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+        const now = audioCtx.currentTime;
+        gain.gain.setValueAtTime(0.001, now);
+        gain.gain.linearRampToValueAtTime(0.16, now + 0.03);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + duration + 0.2);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.start(now);
+        osc.stop(now + duration + 0.25);
+
+        synthTimer = setTimeout(playNext, (duration + 0.08) * 1000);
+      }
+
+      playNext();
+    }
+
+    function stopSynth() {
+      if (synthTimer) {
+        clearTimeout(synthTimer);
+        synthTimer = null;
+      }
+    }
+
+    function onTilePress(card) {
+      initAudioContext();
+      const now = Date.now();
+
+      if (currentPlaying && currentPlaying.id === card.id) {
+        const elapsed = (now - playingStartTime) / 1000;
+        if (elapsed < cooldownSec) {
+          return;
+        }
+      }
+
+      currentRepeatCount = 0;
+
+      if (repeatMode === 'all' || isShuffleActive || playbackMode === 'sequential') {
+        const list = getFilteredCards();
+        currentPlaylist = isShuffleActive ? [...list].sort(() => Math.random() - 0.5) : list;
+        const idx = currentPlaylist.findIndex(c => c.id === card.id);
+        currentPlaylistIndex = (idx !== -1) ? idx : 0;
+      }
+
+      playSong(card);
+    }
+
+    function formatAudioStreamUrl(rawUrl) {
+      if (!rawUrl) return '';
+      if (rawUrl.includes('drive.google.com')) {
+        const match = rawUrl.match(/\/d\/([a-zA-Z0-9_-]+)/);
+        if (match && match[1]) {
+          return `https://drive.google.com/uc?export=download&id=${match[1]}`;
+        }
+      }
+      return rawUrl;
+    }
+
+    function playSong(card) {
+      stopAudioEngine();
+
+      currentPlaying = card;
+      playingStartTime = Date.now();
+      updateTileStyles();
+      updateMediaSessionInfo(card);
+
+      if (timerMinutes > 0 && !timerTimeoutId) {
+        timerTimeoutId = setTimeout(() => {
+          stopPlayback(true);
+        }, timerMinutes * 60 * 1000);
+      }
+
+      if (card.audioType === 'file') {
+        let blobUrl = audioBlobCache.get(card.id);
+        if (blobUrl) {
+          localAudio.src = blobUrl;
+          localAudio.play().catch(() => playSynthFallback(card));
+          localAudio.onended = onTrackEnded;
+          return;
+        }
+      }
+
+      if (card.audioType === 'url' && card.streamUrl) {
+        const finalUrl = formatAudioStreamUrl(card.streamUrl);
+        localAudio.src = finalUrl;
+        localAudio.play().catch(() => playSynthFallback(card));
+        localAudio.onended = onTrackEnded;
+        return;
+      }
+
+      if (card.audioType === 'youtube' && card.ytId && isYtReady && ytPlayer) {
+        try {
+          ytPlayer.loadVideoById(card.ytId);
+          ytPlayer.playVideo();
+          return;
+        } catch (e) {
+          playSynthFallback(card);
+          return;
+        }
+      }
+
+      playSynthFallback(card);
+    }
+
+    function playSynthFallback(card) {
+      playSynthMelody('twinkle', onTrackEnded);
+    }
+
+    function onTrackEnded() {
+      if (repeatMode === 'one' && currentPlaying) {
+        currentRepeatCount++;
+        if (repeatCountLimit > 0 && currentRepeatCount >= repeatCountLimit) {
+          currentRepeatCount = 0;
+          stopPlayback(false);
+          return;
+        }
+        playSong(currentPlaying);
+        return;
+      }
+
+      if (repeatMode === 'all' || isShuffleActive || playbackMode === 'sequential') {
+        playNextInPlaylist();
+      } else {
+        stopAudioEngine();
+        currentPlaying = null;
+        updateTileStyles();
+        updateMediaSessionInfo(null);
+      }
+    }
+
+    function playNextInPlaylist() {
+      if (!currentPlaylist.length) {
+        const list = getFilteredCards();
+        if (!list.length) return;
+        currentPlaylist = isShuffleActive ? [...list].sort(() => Math.random() - 0.5) : list;
+        currentPlaylistIndex = 0;
+      } else {
+        currentPlaylistIndex = (currentPlaylistIndex + 1) % currentPlaylist.length;
+      }
+
+      const nextCard = currentPlaylist[currentPlaylistIndex];
+      const filtered = getFilteredCards();
+      const nextIndexInFiltered = filtered.findIndex(c => c.id === nextCard.id);
+      if (nextIndexInFiltered !== -1) {
+        const targetPage = Math.floor(nextIndexInFiltered / CARDS_PER_PAGE) + 1;
+        if (targetPage !== currentPage) {
+          flipPage(targetPage > currentPage ? 'forward' : 'backward', targetPage);
+        }
+      }
+
+      playSong(nextCard);
+    }
+
+    function stopAudioEngine() {
+      stopSynth();
+      try {
+        localAudio.pause();
+        localAudio.currentTime = 0;
+      } catch(e){}
+
+      if (isYtReady && ytPlayer && ytPlayer.stopVideo) {
+        try { ytPlayer.stopVideo(); } catch(e){}
+      }
+    }
+
+    function stopPlayback(isManualStop = false) {
+      currentPlaying = null;
+      stopAudioEngine();
+      updateMediaSessionInfo(null);
+
+      if (timerTimeoutId) {
+        clearTimeout(timerTimeoutId);
+        timerTimeoutId = null;
+      }
+      if (timerIntervalId) {
+        clearInterval(timerIntervalId);
+        timerIntervalId = null;
+      }
+      timerEndTime = null;
+      timerMinutes = 0;
+
+      hideVisualTimer();
+      currentRepeatCount = 0;
+
+      if (isManualStop && playbackMode === 'sequential') {
+        playbackMode = 'single';
+      }
+
+      updateControlButtons();
+      updateTileStyles();
+      updateTimerUI();
+    }
+
+    // 카테고리 ID 및 이름 양방향 안전 매칭 검사
+    function cardHasCategory(card, categoryObj) {
+      if (!card || !categoryObj) return false;
+      const cats = Array.isArray(card.categories) ? card.categories : (card.theme ? [card.theme] : []);
+      return cats.includes(categoryObj.id) || cats.includes(categoryObj.name);
+    }
+
+    function getFilteredCards() {
+      if (activeFilter === 'all') return cards;
+      const targetCat = categories.find(c => c.id === activeFilter);
+      return cards.filter(c => {
+        if (!c) return false;
+        if (targetCat) {
+          return cardHasCategory(c, targetCat);
+        }
+        const cats = Array.isArray(c.categories) ? c.categories : (c.theme ? [c.theme] : []);
+        return cats.includes(activeFilter);
+      });
+    }
+
+    function getPageCards(pageNum) {
+      const filtered = getFilteredCards();
+      const start = (pageNum - 1) * CARDS_PER_PAGE;
+      return filtered.slice(start, start + CARDS_PER_PAGE);
+    }
+
+    function flipPage(direction, targetPageNumber) {
+      if (isPageFlipping) return;
+      const filtered = getFilteredCards();
+      const totalPages = Math.max(1, Math.ceil(filtered.length / CARDS_PER_PAGE));
+      if (targetPageNumber < 1 || targetPageNumber > totalPages) return;
+
+      isPageFlipping = true;
+      const stage = document.getElementById('book-stage');
+      const activeSheet = document.getElementById('active-sheet');
+      const underSheet = document.getElementById('under-sheet');
+      const underGrid = underSheet.querySelector('.under-grid');
+
+      if (direction === 'forward') {
+        populateGridCards(underGrid, getPageCards(targetPageNumber));
+        activeSheet.className = 'songbook-sheet flex items-stretch z-20 sheet-slide-out-left';
+
+        currentPage = targetPageNumber;
+        updatePaginationControls(totalPages);
+
+        setTimeout(() => {
+          const activeGrid = document.getElementById('active-grid');
+          populateGridCards(activeGrid, getPageCards(currentPage));
+          activeSheet.className = 'songbook-sheet flex items-stretch z-20';
+          isPageFlipping = false;
+        }, 850);
+      } else {
+        const incomingSheet = underSheet.cloneNode(true);
+        incomingSheet.removeAttribute('id');
+        populateGridCards(incomingSheet.querySelector('.under-grid'), getPageCards(targetPageNumber));
+        incomingSheet.className = 'songbook-sheet flex items-stretch z-30 sheet-slide-in-from-left';
+        stage.appendChild(incomingSheet);
+
+        currentPage = targetPageNumber;
+        updatePaginationControls(totalPages);
+
+        setTimeout(() => {
+          const activeGrid = document.getElementById('active-grid');
+          populateGridCards(activeGrid, getPageCards(currentPage));
+          incomingSheet.remove();
+          isPageFlipping = false;
+        }, 850);
+      }
+    }
+
+    function renderPage() {
+      const filtered = getFilteredCards();
+      const totalPages = Math.max(1, Math.ceil(filtered.length / CARDS_PER_PAGE));
+      if (currentPage > totalPages) currentPage = totalPages;
+
+      const pageCards = getPageCards(currentPage);
+      const activeGrid = document.getElementById('active-grid');
+      populateGridCards(activeGrid, pageCards);
+      updatePaginationControls(totalPages);
+    }
+
+    function populateGridCards(gridContainer, pageCards) {
+      gridContainer.innerHTML = '';
+
+      pageCards.forEach(card => {
+        const isPlaying = currentPlaying && currentPlaying.id === card.id;
+        const tile = document.createElement('button');
+        tile.id = `tile-${card.id}`;
+        tile.className = `soundbook-tile relative w-full h-full rounded-2xl overflow-hidden border border-stone-200/80 flex flex-col items-center justify-center p-2 select-none focus:outline-none ${
+          isPlaying ? 'is-playing' : ''
+        }`;
+
+        if (card.coverType === 'image' && card.coverUrl) {
+          tile.style.backgroundColor = '#FFFFFF';
+          tile.innerHTML = `
+            <img src="${card.coverUrl}" alt="${card.title}" class="w-full h-full object-cover rounded-xl pointer-events-none" onerror="this.src='https://placehold.co/400x400/FAF3DF/786B59?text=📖'">
+            <div class="note-badge absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-white/95 shadow-sm flex items-center justify-center text-xs text-amber-700 ${isPlaying ? '' : 'hidden'}">
+              🎵
+            </div>
+          `;
+        } else {
+          const hexCol = card.bgColorHex || '#FFF6D6';
+          const icon = card.icon || '🌟';
+          tile.style.backgroundColor = hexCol;
+          tile.innerHTML = `
+            <div class="text-4xl sm:text-5xl mb-1 pointer-events-none drop-shadow-sm select-none">${icon}</div>
+            <div class="text-xs sm:text-sm font-extrabold text-stone-800 text-center leading-snug line-clamp-2 px-1 pointer-events-none">
+              ${card.title}
+            </div>
+            <div class="note-badge absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-white/95 shadow-sm flex items-center justify-center text-xs text-amber-700 ${isPlaying ? '' : 'hidden'}">
+              🎵
+            </div>
+          `;
+        }
+
+        tile.addEventListener('click', () => onTilePress(card));
+        gridContainer.appendChild(tile);
+      });
+
+      for (let i = pageCards.length; i < CARDS_PER_PAGE; i++) {
+        const emptySlot = document.createElement('div');
+        emptySlot.className = 'w-full h-full rounded-2xl border-2 border-dashed border-stone-200/60 bg-stone-100/20 flex flex-col items-center justify-center';
+        emptySlot.innerHTML = `
+          <span class="text-stone-300 text-xl font-bold">🌱</span>
+        `;
+        gridContainer.appendChild(emptySlot);
+      }
+    }
+
+    function updateTileStyles() {
+      const tiles = document.querySelectorAll('.soundbook-tile');
+      tiles.forEach(tile => {
+        const cardId = tile.id.replace('tile-', '');
+        const isCurrent = currentPlaying && currentPlaying.id === cardId;
+        const badge = tile.querySelector('.note-badge');
+
+        if (isCurrent) {
+          tile.classList.add('is-playing');
+          if (badge) badge.classList.remove('hidden');
+        } else {
+          tile.classList.remove('is-playing');
+          if (badge) badge.classList.add('hidden');
+        }
+      });
+    }
+
+    function updateControlButtons() {
+      const shuffleBtn = document.getElementById('btn-shuffle');
+      const playAllBtn = document.getElementById('btn-play-all');
+      const repeatBtn = document.getElementById('btn-repeat-mode');
+      const repeatIcon = document.getElementById('repeat-icon');
+      const repeatBadge = document.getElementById('repeat-badge');
+
+      if (isShuffleActive) {
+        shuffleBtn.className = 'w-8 h-8 rounded-full bg-[#E5DDCF] text-stone-900 font-black shadow-sm ring-2 ring-[#DFD6C7] flex items-center justify-center text-xs active:scale-95 transition-all';
+      } else {
+        shuffleBtn.className = 'w-8 h-8 rounded-full bg-white/90 text-stone-700 shadow-sm border border-stone-200 flex items-center justify-center text-xs active:scale-95 transition-all';
+      }
+
+      if (playbackMode === 'sequential') {
+        playAllBtn.className = 'w-8 h-8 rounded-full bg-[#E5DDCF] text-stone-900 font-black shadow-sm ring-2 ring-[#DFD6C7] flex items-center justify-center text-xs active:scale-95 transition-all';
+      } else {
+        playAllBtn.className = 'w-8 h-8 rounded-full bg-white/90 text-stone-700 shadow-sm border border-stone-200 flex items-center justify-center text-xs active:scale-95 transition-all';
+      }
+
+      if (repeatMode === 'one') {
+        repeatBtn.className = 'w-8 h-8 rounded-full bg-[#E5DDCF] text-stone-900 font-black shadow-sm ring-2 ring-[#DFD6C7] flex items-center justify-center text-xs active:scale-95 transition-all relative';
+        repeatIcon.className = 'fa-solid fa-repeat text-amber-800 text-[11px]';
+        repeatBadge.classList.remove('hidden');
+      } else if (repeatMode === 'all') {
+        repeatBtn.className = 'w-8 h-8 rounded-full bg-[#E5DDCF] text-stone-900 font-black shadow-sm ring-2 ring-[#DFD6C7] flex items-center justify-center text-xs active:scale-95 transition-all relative';
+        repeatIcon.className = 'fa-solid fa-repeat text-stone-800 text-[11px]';
+        repeatBadge.classList.add('hidden');
+      } else {
+        repeatBtn.className = 'w-8 h-8 rounded-full bg-white/90 text-stone-700 shadow-sm border border-stone-200 flex items-center justify-center text-xs active:scale-95 transition-all relative';
+        repeatIcon.className = 'fa-solid fa-arrow-right text-[11px] text-stone-500';
+        repeatBadge.classList.add('hidden');
+      }
+    }
+
+    document.getElementById('btn-repeat-mode').addEventListener('click', () => {
+      currentRepeatCount = 0;
+      if (repeatMode === 'off') {
+        repeatMode = 'one';
+      } else if (repeatMode === 'one') {
+        repeatMode = 'all';
+      } else {
+        repeatMode = 'off';
+      }
+      updateControlButtons();
+    });
+
+    const customTimerInput = document.getElementById('input-custom-timer');
+    customTimerInput.addEventListener('input', () => {
+      const val = parseInt(customTimerInput.value, 10);
+      setTimerMinutes(isNaN(val) || val < 0 ? 0 : val);
+    });
+
+    function updateTimerUI() {
+      const t = I18N[currentUiLang] || I18N.ko;
+      const badge = document.getElementById('timer-status-badge');
+      const quickBadge = document.getElementById('quick-timer-badge');
+      const quickStatus = document.getElementById('quick-timer-status');
+      const quickIconBtn = document.getElementById('btn-timer-quick');
+
+      if (!timerEndTime || timerMinutes === 0) {
+        badge.textContent = t.timerOff;
+        badge.className = 'text-[10px] text-stone-600 font-bold bg-stone-100 px-1.5 py-0.5 rounded';
+        quickStatus.textContent = t.timerOff;
+        quickStatus.className = 'text-[10px] text-stone-600 font-bold bg-stone-100 px-1.5 py-0.5 rounded';
+        quickBadge.classList.add('hidden');
+        quickIconBtn.className = 'w-8 h-8 rounded-full bg-white/90 text-stone-700 shadow-sm border border-stone-200 flex items-center justify-center text-xs active:scale-95 transition-all relative';
+      } else {
+        const remainingSec = Math.max(0, Math.ceil((timerEndTime - Date.now()) / 1000));
+        let displayRemaining = '';
+        if (remainingSec >= 60) {
+          const m = Math.ceil(remainingSec / 60);
+          displayRemaining = `${m}${t.timerUnit}`;
+        } else {
+          displayRemaining = `${remainingSec}s`;
+        }
+
+        badge.textContent = displayRemaining;
+        badge.className = 'text-[10px] text-amber-800 font-bold bg-amber-100 px-1.5 py-0.5 rounded';
+        quickStatus.textContent = displayRemaining;
+        quickStatus.className = 'text-[10px] text-amber-800 font-bold bg-amber-100 px-1.5 py-0.5 rounded';
+        quickBadge.textContent = displayRemaining;
+        quickBadge.classList.remove('hidden');
+        quickIconBtn.className = 'w-8 h-8 rounded-full bg-[#E5DDCF] text-stone-900 font-black shadow-sm ring-2 ring-[#DFD6C7] flex items-center justify-center text-xs active:scale-95 transition-all relative';
+      }
+
+      const customInputEl = document.getElementById('input-custom-timer');
+      const quickInputEl = document.getElementById('input-quick-timer');
+      if (customInputEl && document.activeElement !== customInputEl) {
+        customInputEl.value = timerMinutes > 0 ? timerMinutes : '';
+      }
+      if (quickInputEl && document.activeElement !== quickInputEl) {
+        quickInputEl.value = timerMinutes > 0 ? timerMinutes : '';
+      }
+    }
+
+    document.querySelectorAll('.btn-repeat-limit-opt').forEach(btn => {
+      btn.addEventListener('click', () => {
+        repeatCountLimit = parseInt(btn.dataset.count, 10);
+        currentRepeatCount = 0;
+        updateRepeatLimitUI();
+      });
+    });
+
+    function updateRepeatLimitUI() {
+      const t = I18N[currentUiLang] || I18N.ko;
+      const badge = document.getElementById('repeat-limit-badge');
+      if (repeatCountLimit === 0) {
+        badge.textContent = t.unlimited;
+      } else {
+        badge.textContent = `${repeatCountLimit}${t.countUnit}`;
+      }
+
+      document.querySelectorAll('.btn-repeat-limit-opt').forEach(btn => {
+        const val = parseInt(btn.dataset.count, 10);
+        if (val === repeatCountLimit) {
+          btn.className = 'btn-repeat-limit-opt py-1 text-[11px] font-bold rounded-lg border bg-stone-200 border-stone-400 text-stone-900 shadow-sm';
+        } else {
+          btn.className = 'btn-repeat-limit-opt py-1 text-[11px] font-bold rounded-lg border bg-stone-50 border-stone-200 text-stone-600';
+        }
+      });
+    }
+
+    document.getElementById('btn-prev-page').addEventListener('click', () => {
+      if (currentPage > 1) {
+        flipPage('backward', currentPage - 1);
+      }
+    });
+
+    document.getElementById('btn-next-page').addEventListener('click', () => {
+      const filtered = getFilteredCards();
+      const totalPages = Math.ceil(filtered.length / CARDS_PER_PAGE);
+      if (currentPage < totalPages) {
+        flipPage('forward', currentPage + 1);
+      }
+    });
+
+    document.getElementById('btn-shuffle').addEventListener('click', () => {
+      initAudioContext();
+      const list = getFilteredCards();
+      if (!list.length) return;
+
+      isShuffleActive = !isShuffleActive;
+      if (isShuffleActive) {
+        currentPlaylist = [...list].sort(() => Math.random() - 0.5);
+        currentPlaylistIndex = 0;
+        updateControlButtons();
+        playSong(currentPlaylist[0]);
+      } else {
+        updateControlButtons();
+      }
+    });
+
+    document.getElementById('btn-play-all').addEventListener('click', () => {
+      initAudioContext();
+      const list = getFilteredCards();
+      if (!list.length) return;
+
+      if (playbackMode === 'sequential') {
+        playbackMode = 'single';
+        updateControlButtons();
+        return;
+      }
+      playbackMode = 'sequential';
+      currentPlaylist = isShuffleActive ? [...list].sort(() => Math.random() - 0.5) : list;
+      currentPlaylistIndex = 0;
+      updateControlButtons();
+      playSong(currentPlaylist[0]);
+    });
+
+    document.getElementById('btn-stop-all').addEventListener('click', () => {
+      stopPlayback(true);
+    });
+
+    function renderFilterChips() {
+      const container = document.getElementById('filter-chip-container');
+      container.innerHTML = '';
+
+      categories.forEach(cat => {
+        const btn = document.createElement('button');
+        btn.dataset.filter = cat.id;
+        const isActive = activeFilter === cat.id;
+        btn.className = `filter-chip h-8 px-3 rounded-full text-xs font-bold shadow-sm flex-shrink-0 border flex items-center gap-1.5 transition-all ${
+          isActive 
+            ? 'bg-[#EFE8DC] text-stone-900 font-extrabold border-[#DFD6C7] ring-1 ring-[#DFD6C7]' 
+            : 'bg-white/85 text-stone-700 border-stone-200'
+        }`;
+        
+        const catName = cat.id === 'all' ? (I18N[currentUiLang] || I18N.ko).allFilterName : (cat.name || '');
+        btn.innerHTML = `<span>${cat.icon}</span><span class="truncate max-w-[64px]">${catName}</span>`;
+
+        btn.addEventListener('click', () => {
+          activeFilter = cat.id;
+          currentPage = 1;
+          renderFilterChips();
+          renderPage();
+        });
+
+        container.appendChild(btn);
+      });
+    }
+
+    let touchStartX = 0;
+    const stageArea = document.getElementById('book-stage');
+    stageArea.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive: true });
+    stageArea.addEventListener('touchend', e => { handleSwipe(e.changedTouches[0].clientX - touchStartX); });
+    stageArea.addEventListener('mousedown', e => { touchStartX = e.clientX; });
+    stageArea.addEventListener('mouseup', e => { handleSwipe(e.clientX - touchStartX); });
+
+    function handleSwipe(deltaX) {
+      if (isPageFlipping) return;
+      const filtered = getFilteredCards();
+      const totalPages = Math.ceil(filtered.length / CARDS_PER_PAGE);
+      if (deltaX < -45 && currentPage < totalPages) {
+        flipPage('forward', currentPage + 1);
+      } else if (deltaX > 45 && currentPage > 1) {
+        flipPage('backward', currentPage - 1);
+      }
+    }
+
+    function updatePaginationControls(totalPages) {
+      document.getElementById('page-text').textContent = `${currentPage} / ${Math.max(1, totalPages)}`;
+      document.getElementById('btn-prev-page').disabled = currentPage <= 1;
+      document.getElementById('btn-next-page').disabled = currentPage >= totalPages || totalPages === 0;
+
+      const dotsContainer = document.getElementById('page-dots');
+      dotsContainer.innerHTML = '';
+      const displayPages = Math.max(1, totalPages);
+      for (let i = 1; i <= displayPages; i++) {
+        const dot = document.createElement('div');
+        dot.className = `w-2 h-2 rounded-full transition-all ${
+          i === currentPage ? 'bg-stone-500 w-4' : 'bg-stone-300'
+        }`;
+        dotsContainer.appendChild(dot);
+      }
+    }
+
+    function renderAddModalCategoryBubbles() {
+      const container = document.getElementById('add-modal-category-bubbles');
+      container.innerHTML = '';
+
+      const validCategories = categories.filter(cat => cat.id !== 'all');
+      if (validCategories.length === 0) {
+        const msg = (I18N[currentUiLang] || I18N.ko).noCategories;
+        container.innerHTML = `<span class="text-[11px] text-stone-400 py-0.5 px-1 font-medium">${msg}</span>`;
+        return;
+      }
+
+      validCategories.forEach(cat => {
+        const isSelected = selectedAddCategoryIds.includes(cat.id);
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = `px-2 py-0.5 text-xs rounded-lg border transition-all ${
+          isSelected 
+            ? 'bg-amber-100 border-amber-300 text-stone-800 font-bold shadow-sm' 
+            : 'bg-white border-stone-200 text-stone-600 font-medium'
+        }`;
+        btn.innerHTML = `<span>${cat.icon}</span> <span>${cat.name}</span>`;
+
+        btn.addEventListener('click', () => {
+          if (selectedAddCategoryIds.includes(cat.id)) {
+            selectedAddCategoryIds = selectedAddCategoryIds.filter(id => id !== cat.id);
+          } else {
+            selectedAddCategoryIds.push(cat.id);
+          }
+          renderAddModalCategoryBubbles();
+        });
+
+        container.appendChild(btn);
+      });
+    }
+
+    function updateCategorySelectOptions() {
+      const filterSelect = document.getElementById('modal-category-filter');
+      const allLabel = (I18N[currentUiLang] || I18N.ko).allFilterName;
+      filterSelect.innerHTML = `<option value="all">${allLabel}</option>`;
+
+      categories.forEach(cat => {
+        if (cat.id !== 'all') {
+          const optFilter = document.createElement('option');
+          optFilter.value = cat.id;
+          optFilter.textContent = `${cat.icon} ${cat.name || ''}`;
+          filterSelect.appendChild(optFilter);
+        }
+      });
+      filterSelect.value = modalFilterCategory;
+    }
+
+    const modal = document.getElementById('parent-modal');
+    document.getElementById('btn-open-settings').addEventListener('click', () => {
+      modal.classList.remove('hidden');
+      renderAddModalCategoryBubbles();
+      renderModalCategoryTags();
+      renderModalCardList();
+      updateCategorySelectOptions();
+      updateTilePreview();
+      document.getElementById('family-sync-key').value = familySyncKey;
+    });
+    document.getElementById('btn-close-modal').addEventListener('click', () => modal.classList.add('hidden'));
+    document.getElementById('btn-finish-modal').addEventListener('click', () => modal.classList.add('hidden'));
+
+    const cooldownInput = document.getElementById('input-cooldown');
+    const cooldownVal = document.getElementById('cooldown-val');
+    cooldownInput.addEventListener('input', () => {
+      cooldownSec = parseInt(cooldownInput.value, 10);
+      cooldownVal.textContent = `${cooldownSec}${(I18N[currentUiLang] || I18N.ko).cooldownSuffix}`;
+      saveLocalData();
+    });
+
+    document.getElementById('modal-search-input').addEventListener('input', (e) => {
+      modalSearchTerm = e.target.value.trim().toLowerCase();
+      renderModalCardList();
+    });
+
+    document.getElementById('modal-category-filter').addEventListener('change', (e) => {
+      modalFilterCategory = e.target.value;
+      renderModalCardList();
+    });
+
+    const tabCoverPic = document.getElementById('tab-cover-pic');
+    const tabCoverText = document.getElementById('tab-cover-text');
+    const panelCoverPic = document.getElementById('panel-cover-pic');
+    const panelCoverText = document.getElementById('panel-cover-text');
+
+    tabCoverPic.addEventListener('click', () => {
+      currentCoverType = 'image';
+      tabCoverPic.className = 'py-1 text-xs font-bold rounded-lg border bg-amber-50 border-amber-200 text-amber-900 flex items-center justify-center transition-colors';
+      tabCoverText.className = 'py-1 text-xs font-bold rounded-lg border bg-stone-50 border-stone-200 text-stone-600 flex items-center justify-center transition-colors';
+      panelCoverPic.classList.remove('hidden');
+      panelCoverText.classList.add('hidden');
+      updateTilePreview();
+    });
+
+    tabCoverText.addEventListener('click', () => {
+      currentCoverType = 'text';
+      tabCoverText.className = 'py-1 text-xs font-bold rounded-lg border bg-amber-50 border-amber-200 text-amber-900 flex items-center justify-center transition-colors';
+      tabCoverPic.className = 'py-1 text-xs font-bold rounded-lg border bg-stone-50 border-stone-200 text-stone-600 flex items-center justify-center transition-colors';
+      panelCoverText.classList.remove('hidden');
+      panelCoverPic.classList.add('hidden');
+      updateTilePreview();
+    });
+
+    document.querySelectorAll('.color-swatch').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.color-swatch').forEach(b => b.classList.remove('ring-2', 'ring-stone-700'));
+        btn.classList.add('ring-2', 'ring-stone-700');
+        const hex = btn.dataset.hex;
+        document.getElementById('selected-tile-hex').value = hex;
+        document.getElementById('custom-color-picker').value = hex;
+        updateTilePreview();
+      });
+    });
+
+    const customColorPicker = document.getElementById('custom-color-picker');
+    customColorPicker.addEventListener('input', (e) => {
+      const hex = e.target.value;
+      document.querySelectorAll('.color-swatch').forEach(b => b.classList.remove('ring-2', 'ring-stone-700'));
+      document.getElementById('selected-tile-hex').value = hex;
+      updateTilePreview();
+    });
+
+    const iconInput = document.getElementById('selected-card-icon');
+    iconInput.addEventListener('input', updateTilePreview);
+    document.getElementById('new-title').addEventListener('input', updateTilePreview);
+
+    function updateTilePreview() {
+      const previewBox = document.getElementById('tile-preview-box');
+      const textContent = document.getElementById('preview-text-content');
+      const imgContent = document.getElementById('preview-img-content');
+      const defaultPreviewText = (I18N[currentUiLang] || I18N.ko).previewText;
+      const title = document.getElementById('new-title').value.trim() || defaultPreviewText;
+
+      if (currentCoverType === 'image') {
+        if (currentCoverPhotoDataUrl) {
+          textContent.classList.add('hidden');
+          imgContent.src = currentCoverPhotoDataUrl;
+          imgContent.classList.remove('hidden');
+          previewBox.style.backgroundColor = '#FFFFFF';
+        } else {
+          textContent.classList.remove('hidden');
+          imgContent.classList.add('hidden');
+          imgContent.src = '';
+          previewBox.style.backgroundColor = '#F5F5F4';
+          document.getElementById('tile-preview-icon').textContent = '📷';
+          document.getElementById('tile-preview-text').textContent = title;
+        }
+      } else {
+        textContent.classList.remove('hidden');
+        imgContent.classList.add('hidden');
+        imgContent.src = '';
+        const hexColor = document.getElementById('selected-tile-hex').value || '#FFF6D6';
+        const emoji = iconInput.value.trim() || '🌟';
+        previewBox.style.backgroundColor = hexColor;
+        document.getElementById('tile-preview-icon').textContent = emoji;
+        document.getElementById('tile-preview-text').textContent = title;
+      }
+    }
+
+    const tabSrcYt = document.getElementById('tab-src-yt');
+    const tabSrcUrl = document.getElementById('tab-src-url');
+    const tabSrcFile = document.getElementById('tab-src-file');
+    const panelSrcYt = document.getElementById('panel-src-yt');
+    const panelSrcUrl = document.getElementById('panel-src-url');
+    const panelSrcFile = document.getElementById('panel-src-file');
+
+    tabSrcFile.addEventListener('click', () => {
+      currentAudioSourceType = 'file';
+      tabSrcFile.className = 'py-1 text-[11px] font-bold rounded-lg border bg-stone-100 border-stone-200 text-stone-800 flex items-center justify-center transition-colors';
+      tabSrcYt.className = 'py-1 text-[11px] font-bold rounded-lg border bg-stone-50 border-stone-200 text-stone-600 flex items-center justify-center transition-colors';
+      tabSrcUrl.className = 'py-1 text-[11px] font-bold rounded-lg border bg-stone-50 border-stone-200 text-stone-600 flex items-center justify-center transition-colors';
+      panelSrcFile.classList.remove('hidden');
+      panelSrcYt.classList.add('hidden');
+      panelSrcUrl.classList.add('hidden');
+    });
+
+    tabSrcYt.addEventListener('click', () => {
+      currentAudioSourceType = 'youtube';
+      tabSrcYt.className = 'py-1 text-[11px] font-bold rounded-lg border bg-stone-100 border-stone-200 text-stone-800 flex items-center justify-center transition-colors';
+      tabSrcUrl.className = 'py-1 text-[11px] font-bold rounded-lg border bg-stone-50 border-stone-200 text-stone-600 flex items-center justify-center transition-colors';
+      tabSrcFile.className = 'py-1 text-[11px] font-bold rounded-lg border bg-stone-50 border-stone-200 text-stone-600 flex items-center justify-center transition-colors';
+      panelSrcYt.classList.remove('hidden');
+      panelSrcUrl.classList.add('hidden');
+      panelSrcFile.classList.add('hidden');
+    });
+
+    tabSrcUrl.addEventListener('click', () => {
+      currentAudioSourceType = 'url';
+      tabSrcUrl.className = 'py-1 text-[11px] font-bold rounded-lg border bg-stone-100 border-stone-200 text-stone-800 flex items-center justify-center transition-colors';
+      tabSrcYt.className = 'py-1 text-[11px] font-bold rounded-lg border bg-stone-50 border-stone-200 text-stone-600 flex items-center justify-center transition-colors';
+      tabSrcFile.className = 'py-1 text-[11px] font-bold rounded-lg border bg-stone-50 border-stone-200 text-stone-600 flex items-center justify-center transition-colors';
+      panelSrcUrl.classList.remove('hidden');
+      panelSrcYt.classList.add('hidden');
+      panelSrcFile.classList.add('hidden');
+    });
+
+    document.getElementById('btn-add-category').addEventListener('click', () => {
+      const emojiInput = document.getElementById('new-cat-emoji');
+      const nameInput = document.getElementById('new-cat-name');
+      const emoji = emojiInput.value.trim() || '🔖';
+      const name = nameInput.value.trim();
+
+      if (!name) return;
+
+      const newId = 'cat-' + Date.now();
+      categories.push({ id: newId, icon: emoji, name, type: 'custom' });
+      saveLocalData();
+      renderFilterChips();
+      updateCategorySelectOptions();
+      renderAddModalCategoryBubbles();
+      renderModalCategoryTags();
+
+      emojiInput.value = '';
+      nameInput.value = '';
+      syncToFamilyCloud();
+    });
+
+    function renderModalCategoryTags() {
+      const container = document.getElementById('modal-category-tags');
+      container.innerHTML = '';
+
+      categories.forEach(cat => {
+        if (cat.id === 'all') return;
+        const tag = document.createElement('div');
+        tag.className = 'flex items-center gap-1 px-2 py-0.5 rounded-lg bg-stone-100 border border-stone-200 text-xs font-semibold text-stone-700';
+        tag.innerHTML = `
+          <span>${cat.icon}</span>
+          <span>${cat.name || ''}</span>
+          <button class="btn-del-cat text-stone-400 hover:text-rose-500 ml-0.5 text-[10px]"><i class="fa-solid fa-xmark"></i></button>
+        `;
+
+        const delBtn = tag.querySelector('.btn-del-cat');
+        if (delBtn) {
+          delBtn.addEventListener('click', () => {
+            categories = categories.filter(c => c.id !== cat.id);
+            if (activeFilter === cat.id) activeFilter = 'all';
+            saveLocalData();
+            renderFilterChips();
+            updateCategorySelectOptions();
+            renderAddModalCategoryBubbles();
+            renderModalCategoryTags();
+            renderPage();
+            renderModalCardList();
+            syncToFamilyCloud();
+          });
+        }
+
+        container.appendChild(tag);
+      });
+    }
+
+    document.getElementById('btn-submit-card').addEventListener('click', async () => {
+      const titleInput = document.getElementById('new-title');
+      const title = titleInput.value.trim();
+      if (!title) return;
+
+      const cardId = 'card-' + Date.now();
+
+      let coverUrl = '';
+      if (currentCoverType === 'image') {
+        if (currentCoverPhotoDataUrl) {
+          coverUrl = currentCoverPhotoDataUrl;
+        } else {
+          const fileInput = document.getElementById('file-cover-input');
+          if (fileInput.files && fileInput.files[0]) {
+            coverUrl = await readFileAsDataUrl(fileInput.files[0]);
+          } else {
+            coverUrl = 'https://placehold.co/400x400/FAF3DF/786B59?text=' + encodeURIComponent(title);
+          }
+        }
+      }
+
+      let audioType = 'synth';
+      let ytId = '';
+      let streamUrl = '';
+
+      if (currentAudioSourceType === 'youtube') {
+        const ytUrl = document.getElementById('input-yt-url').value.trim();
+        ytId = extractYoutubeId(ytUrl);
+        if (ytId) audioType = 'youtube';
+      } else if (currentAudioSourceType === 'url') {
+        const rawUrl = document.getElementById('input-stream-url').value.trim();
+        if (rawUrl) {
+          audioType = 'url';
+          streamUrl = rawUrl;
+        }
+      } else if (currentAudioSourceType === 'file') {
+        const audioFileInput = document.getElementById('file-audio-input');
+        if (audioFileInput.files && audioFileInput.files[0]) {
+          const file = audioFileInput.files[0];
+          audioType = 'file';
+          await saveAudioToDB(cardId, file);
+        }
+      }
+
+      const newCard = {
+        id: cardId,
+        title,
+        categories: [...selectedAddCategoryIds],
+        coverType: currentCoverType,
+        coverUrl,
+        bgColorHex: document.getElementById('selected-tile-hex').value || '#FFF6D6',
+        icon: document.getElementById('selected-card-icon').value.trim() || '🌟',
+        audioType,
+        ytId,
+        streamUrl,
+        audioSynthMelody: 'twinkle'
+      };
+
+      cards.unshift(newCard);
+      saveLocalData();
+      renderPage();
+      renderModalCardList();
+
+      titleInput.value = '';
+      document.getElementById('input-yt-url').value = '';
+      document.getElementById('input-stream-url').value = '';
+      const audioFileInput = document.getElementById('file-audio-input');
+      if (audioFileInput) audioFileInput.value = '';
+      const coverFileInput = document.getElementById('file-cover-input');
+      if (coverFileInput) coverFileInput.value = '';
+
+      const coverLbl = document.getElementById('label-cover-filename');
+      if (coverLbl) coverLbl.textContent = (I18N[currentUiLang] || I18N.ko).selectPhoto;
+      const audioLbl = document.getElementById('label-audio-filename');
+      if (audioLbl) audioLbl.textContent = (I18N[currentUiLang] || I18N.ko).selectAudio;
+
+      selectedAddCategoryIds = [];
+      currentCoverPhotoDataUrl = '';
+      renderAddModalCategoryBubbles();
+      updateTilePreview();
+
+      syncToFamilyCloud();
+    });
+
+    document.getElementById('file-cover-input').addEventListener('change', (e) => {
+      const file = e.target.files && e.target.files[0];
+      const lbl = document.getElementById('label-cover-filename');
+      if (file) {
+        if (lbl) lbl.textContent = `📷 ${file.name}`;
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          currentCoverPhotoDataUrl = event.target.result;
+          updateTilePreview();
+        };
+        reader.readAsDataURL(file);
+      } else {
+        currentCoverPhotoDataUrl = '';
+        updateTilePreview();
+      }
+    });
+
+    document.getElementById('file-audio-input').addEventListener('change', (e) => {
+      const file = e.target.files && e.target.files[0];
+      const lbl = document.getElementById('label-audio-filename');
+      if (file && lbl) {
+        lbl.textContent = `🎵 ${file.name}`;
+      }
+    });
+
+    function toggleCardCategory(cardId, catObj) {
+      const card = cards.find(c => c.id === cardId);
+      if (!card) return;
+
+      if (!Array.isArray(card.categories)) {
+        card.categories = card.theme ? [card.theme] : [];
+      }
+
+      const isAssigned = cardHasCategory(card, catObj);
+
+      if (isAssigned) {
+        card.categories = card.categories.filter(val => val !== catObj.id && val !== catObj.name);
+      } else {
+        card.categories.push(catObj.id);
+      }
+
+      saveLocalData();
+      renderPage();
+      renderModalCardList();
+      syncToFamilyCloud();
+    }
+
+    function renderModalCardList() {
+      const listEl = document.getElementById('modal-card-list');
+      const badge = document.getElementById('total-count-badge');
+      badge.textContent = `${cards.length}`;
+      listEl.innerHTML = '';
+
+      const validCategories = categories.filter(cat => cat.id !== 'all');
+
+      let filteredCards = cards.filter(c => {
+        const matchTitle = !modalSearchTerm || c.title.toLowerCase().includes(modalSearchTerm);
+        let matchCat = modalFilterCategory === 'all';
+        if (!matchCat) {
+          const targetCat = categories.find(cat => cat.id === modalFilterCategory);
+          if (targetCat) {
+            matchCat = cardHasCategory(c, targetCat);
+          } else {
+            const cats = Array.isArray(c.categories) ? c.categories : (c.theme ? [c.theme] : []);
+            matchCat = cats.includes(modalFilterCategory);
+          }
+        }
+        return matchTitle && matchCat;
+      });
+
+      if (filteredCards.length === 0) {
+        const emptyMsg = (I18N[currentUiLang] || I18N.ko).emptyList;
+        listEl.innerHTML = `
+          <div class="py-3 text-center text-xs text-stone-400 font-medium">
+            ${emptyMsg}
+          </div>
+        `;
+        return;
+      }
+
+      filteredCards.forEach((c) => {
+        const originalIndex = cards.findIndex(card => card.id === c.id);
+        const isFirst = originalIndex === 0;
+        const isLast = originalIndex === cards.length - 1;
+
+        const item = document.createElement('div');
+        item.className = 'flex flex-col p-2 bg-stone-50 hover:bg-stone-100/70 rounded-xl border border-stone-200 gap-1.5 transition-colors';
+        
+        const topRow = document.createElement('div');
+        topRow.className = 'flex items-center justify-between w-full';
+        topRow.innerHTML = `
+          <div class="flex items-center gap-1.5 truncate flex-1 min-w-0 mr-1.5">
+            <span class="text-xs flex-shrink-0">${c.icon || '📖'}</span>
+            <span class="font-bold text-xs text-stone-800 truncate">${c.title}</span>
+          </div>
+
+          <div class="flex items-center gap-1 flex-shrink-0">
+            <button class="btn-move-up w-5 h-5 rounded-md bg-white border border-stone-200/90 text-stone-600 hover:text-stone-900 disabled:opacity-20 disabled:pointer-events-none flex items-center justify-center text-[9px] active:scale-95 shadow-sm"
+                    ${isFirst ? 'disabled' : ''}>
+              <i class="fa-solid fa-chevron-up"></i>
+            </button>
+            <button class="btn-move-down w-5 h-5 rounded-md bg-white border border-stone-200/90 text-stone-600 hover:text-stone-900 disabled:opacity-20 disabled:pointer-events-none flex items-center justify-center text-[9px] active:scale-95 shadow-sm"
+                    ${isLast ? 'disabled' : ''}>
+              <i class="fa-solid fa-chevron-down"></i>
+            </button>
+            <button class="btn-del w-5 h-5 rounded-md bg-white border border-stone-200/90 text-stone-400 hover:text-rose-500 flex items-center justify-center text-[10px] active:scale-95 transition-colors shadow-sm"
+                    data-id="${c.id}">
+              <i class="fa-solid fa-trash-can"></i>
+            </button>
+          </div>
+        `;
+
+        topRow.querySelector('.btn-move-up').addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (originalIndex > 0) {
+            const temp = cards[originalIndex];
+            cards[originalIndex] = cards[originalIndex - 1];
+            cards[originalIndex - 1] = temp;
+            saveLocalData();
+            renderPage();
+            renderModalCardList();
+            syncToFamilyCloud();
+          }
+        });
+
+        topRow.querySelector('.btn-move-down').addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (originalIndex < cards.length - 1) {
+            const temp = cards[originalIndex];
+            cards[originalIndex] = cards[originalIndex + 1];
+            cards[originalIndex + 1] = temp;
+            saveLocalData();
+            renderPage();
+            renderModalCardList();
+            syncToFamilyCloud();
+          }
+        });
+
+        topRow.querySelector('.btn-del').addEventListener('click', async (e) => {
+          e.stopPropagation();
+          await deleteAudioFromDB(c.id);
+          cards = cards.filter(card => card.id !== c.id);
+          saveLocalData();
+          renderPage();
+          renderModalCardList();
+          syncToFamilyCloud();
+        });
+
+        item.appendChild(topRow);
+
+        // 목록 내에서 직접 카테고리를 껐다 켤 수 있는 태그 바
+        if (validCategories.length > 0) {
+          const catRow = document.createElement('div');
+          catRow.className = 'flex flex-wrap gap-1 items-center pt-0.5 border-t border-stone-200/60';
+          
+          validCategories.forEach(cat => {
+            const isAssigned = cardHasCategory(c, cat);
+            const tagBtn = document.createElement('button');
+            tagBtn.type = 'button';
+            tagBtn.className = `px-1.5 py-0.5 rounded text-[10px] font-bold border transition-all ${
+              isAssigned 
+                ? 'bg-amber-100 border-amber-300 text-stone-800' 
+                : 'bg-white border-stone-200/80 text-stone-400 opacity-60'
+            }`;
+            tagBtn.innerHTML = `<span>${cat.icon}</span> <span>${cat.name}</span>`;
+            tagBtn.addEventListener('click', (e) => {
+              e.stopPropagation();
+              toggleCardCategory(c.id, cat);
+            });
+            catRow.appendChild(tagBtn);
+          });
+
+          item.appendChild(catRow);
+        }
+
+        listEl.appendChild(item);
+      });
+    }
+
+    document.getElementById('btn-save-family-key').addEventListener('click', () => {
+      const val = document.getElementById('family-sync-key').value.trim();
+      familySyncKey = val;
+      localStorage.setItem('baby_family_sync_key', familySyncKey);
+
+      if (familySyncKey) {
+        startFamilyPolling();
+        fetchFromFamilyCloud();
+      } else {
+        if (cloudPollInterval) clearInterval(cloudPollInterval);
+      }
+    });
+
+    async function syncToFamilyCloud() {
+      if (!familySyncKey) return;
+      try {
+        const cloudData = {
+          cards: cards.map(c => {
+            const clone = { ...c };
+            delete clone.audioBlobUrl;
+            return clone;
+          }),
+          categories,
+          cooldownSec,
+          updatedAt: Date.now()
+        };
+
+        await fetch(`https://api.counterapi.dev/v1/bebe_${encodeURIComponent(familySyncKey)}/up`, {
+          method: 'GET',
+          mode: 'no-cors'
+        }).catch(()=>{});
+
+        localStorage.setItem(`cloud_last_${familySyncKey}`, JSON.stringify(cloudData));
+      } catch (e) {}
+    }
+
+    async function fetchFromFamilyCloud() {
+      if (!familySyncKey) return;
+      try {
+        const cached = localStorage.getItem(`cloud_last_${familySyncKey}`);
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (parsed && parsed.cards) {
+            mergeIncomingCards(parsed.cards);
+            if (parsed.categories) categories = parsed.categories;
+            if (parsed.cooldownSec) cooldownSec = parsed.cooldownSec;
+            saveLocalData();
+            renderFilterChips();
+            renderPage();
+            renderModalCategoryTags();
+            renderModalCardList();
+            renderAddModalCategoryBubbles();
+          }
+        }
+      } catch (e) {}
+    }
+
+    function startFamilyPolling() {
+      if (cloudPollInterval) clearInterval(cloudPollInterval);
+      cloudPollInterval = setInterval(() => {
+        if (familySyncKey) fetchFromFamilyCloud();
+      }, 5000);
+    }
+
+    document.getElementById('btn-export-bundle').addEventListener('click', async () => {
+      const exportCards = [];
+      const audioFilesMap = {};
+
+      for (const c of cards) {
+        const clone = { ...c };
+        delete clone.audioBlobUrl;
+        exportCards.push(clone);
+
+        if (c.audioType === 'file') {
+          const blob = await getAudioFromDB(c.id);
+          if (blob) {
+            audioFilesMap[c.id] = await blobToBase64(blob);
+          }
+        }
+      }
+
+      const bundleObject = {
+        app: 'BebeSound',
+        version: 2,
+        exportedAt: new Date().toISOString(),
+        cards: exportCards,
+        categories,
+        cooldownSec,
+        audioFiles: audioFilesMap
+      };
+
+      const jsonStr = JSON.stringify(bundleObject);
+      const blob = new Blob([jsonStr], { type: 'application/json' });
+      const fileName = `베베사운드_보따리_${new Date().toISOString().slice(0,10)}.json`;
+
+      if (navigator.share && navigator.canShare && navigator.canShare({ files: [new File([blob], fileName, { type: 'application/json' })] })) {
+        try {
+          const file = new File([blob], fileName, { type: 'application/json' });
+          await navigator.share({
+            files: [file],
+            title: '베베사운드 보따리'
+          });
+          return;
+        } catch(e) {}
+      }
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+
+    document.getElementById('input-import-bundle').addEventListener('change', async (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        try {
+          const bundle = JSON.parse(event.target.result);
+          if (!bundle || !bundle.cards) return;
+
+          if (bundle.audioFiles) {
+            for (const [id, base64Data] of Object.entries(bundle.audioFiles)) {
+              if (base64Data) {
+                const blob = base64ToBlob(base64Data);
+                await saveAudioToDB(id, blob);
+              }
+            }
+          }
+
+          mergeIncomingCards(bundle.cards);
+
+          if (bundle.categories && Array.isArray(bundle.categories)) {
+            bundle.categories.forEach(inCat => {
+              if (!categories.find(c => c.id === inCat.id)) {
+                categories.push(inCat);
+              }
+            });
+          }
+
+          if (bundle.cooldownSec) {
+            cooldownSec = bundle.cooldownSec;
+            cooldownInput.value = cooldownSec;
+            cooldownVal.textContent = `${cooldownSec}${(I18N[currentUiLang] || I18N.ko).cooldownSuffix}`;
+          }
+
+          saveLocalData();
+          await preloadAllAudioBlobs();
+          renderFilterChips();
+          renderPage();
+          renderModalCategoryTags();
+          renderModalCardList();
+          renderAddModalCategoryBubbles();
+          updateCategorySelectOptions();
+        } catch(err) {}
+      };
+      reader.readAsText(file);
+      e.target.value = '';
+    });
+
+    function mergeIncomingCards(incomingCards) {
+      incomingCards.forEach(inCard => {
+        const existingIdx = cards.findIndex(c => c.id === inCard.id);
+        if (existingIdx !== -1) {
+          cards[existingIdx] = { ...cards[existingIdx], ...inCard };
+        } else {
+          cards.push(inCard);
+        }
+      });
+    }
+
+    const resetBtn = document.getElementById('btn-reset-preset');
+    resetBtn.addEventListener('click', () => {
+      const t = I18N[currentUiLang] || I18N.ko;
+      if (!resetConfirmPending) {
+        resetConfirmPending = true;
+        resetBtn.textContent = t.resetConfirm;
+        resetBtn.className = 'text-xs text-rose-500 font-bold underline transition-colors';
+        setTimeout(() => {
+          resetConfirmPending = false;
+          resetBtn.textContent = t.resetBtn;
+          resetBtn.className = 'text-xs text-stone-400 hover:text-stone-600 underline font-semibold transition-colors';
+        }, 3500);
+        return;
+      }
+
+      resetConfirmPending = false;
+      resetBtn.textContent = t.resetBtn;
+      resetBtn.className = 'text-xs text-stone-400 hover:text-stone-600 underline font-semibold transition-colors';
+
+      cards = [];
+      categories = JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
+      cooldownSec = 6;
+      cooldownInput.value = 6;
+      cooldownVal.textContent = `6${t.cooldownSuffix}`;
+      activeFilter = 'all';
+      modalSearchTerm = '';
+      modalFilterCategory = 'all';
+      selectedAddCategoryIds = [];
+      localStorage.removeItem('baby_soundbook_vclean');
+      saveLocalData();
+      renderFilterChips();
+      renderPage();
+      renderModalCategoryTags();
+      renderModalCardList();
+      renderAddModalCategoryBubbles();
+    });
+
+    function extractYoutubeId(url) {
+      if (!url) return '';
+      const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+      const match = url.match(regExp);
+      return (match && match[2].length === 11) ? match[2] : '';
+    }
+
+    function saveLocalData() {
+      const persistable = cards.map(c => {
+        const clone = { ...c };
+        if (clone.audioBlobUrl) delete clone.audioBlobUrl;
+        return clone;
+      });
+      localStorage.setItem('baby_soundbook_vclean', JSON.stringify({ cards: persistable, categories, cooldownSec }));
+    }
+
+    function loadLocalData() {
+      const saved = localStorage.getItem('baby_soundbook_vclean');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          cards = Array.isArray(parsed.cards) ? parsed.cards : [];
+          categories = (parsed.categories && Array.isArray(parsed.categories)) ? parsed.categories : JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
+          if (parsed.cooldownSec) {
+            cooldownSec = parsed.cooldownSec;
+            cooldownInput.value = cooldownSec;
+          }
+        } catch (e) {
+          cards = [];
+          categories = JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
+        }
+      } else {
+        cards = [];
+        categories = JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
+      }
+
+      familySyncKey = localStorage.getItem('baby_family_sync_key') || '';
+      if (familySyncKey) {
+        startFamilyPolling();
+      }
+
+      const savedLang = localStorage.getItem('baby_ui_lang');
+      setUiLanguage(savedLang || 'ko');
+    }
+
+    window.onYouTubeIframeAPIReady = function() {
+      try {
+        ytPlayer = new YT.Player('yt-player-slot', {
+          height: '1',
+          width: '1',
+          videoId: '',
+          playerVars: {
+            playsinline: 1,
+            controls: 0,
+            disablekb: 1,
+            fs: 0
+          },
+          events: {
+            onReady: () => { isYtReady = true; },
+            onStateChange: (e) => {
+              if (e.data === YT.PlayerState.ENDED) onTrackEnded();
+            },
+            onError: () => {
+              if (currentPlaying) playSynthFallback(currentPlaying);
+            }
+          }
+        });
+      } catch(e) {
+        isYtReady = false;
+      }
+    };
+
+    const tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    const firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+    window.onload = async function() {
+      await initDB();
+      loadLocalData();
+      await preloadAllAudioBlobs();
+      renderFilterChips();
+      renderPage();
+      updateControlButtons();
+    };
+  </script>
+</body>
+</html>
