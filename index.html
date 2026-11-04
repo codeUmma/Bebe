@@ -3,11 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>베베오디오</title>
+  <!-- [엄마가 직접 바꾸는 곳 1] 브라우저 및 홈 화면 앱 이름 -->
+  <title>Bebe Audio</title>
 
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="베베오디오">
+  <!-- [엄마가 직접 바꾸는 곳 2] 아이폰 홈 화면에 뜰 앱 이름 -->
+  <meta name="apple-mobile-web-app-title" content="Bebe Audio">
   <meta name="theme-color" content="#F7F4EE">
 
   <script>
@@ -30,6 +32,7 @@
         ctx.font = '86px "Apple Color Emoji", "Segoe UI Emoji", sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
+        /* [엄마가 직접 바꾸는 곳 3] 아래 '🎶' 따옴표 안의 이모지를 원하는 걸로 바꾸면 홈 화면 앱 아이콘이 바뀝니다! (예: 🧸, 🐻, 🍼, 👶) */
         ctx.fillText('🎶', 90, 93);
 
         const iconUrl = c.toDataURL('image/png');
@@ -247,14 +250,14 @@
 <body class="flex flex-col justify-between items-center p-2.5 sm:p-4 max-w-lg mx-auto">
 
   <header class="w-full flex items-center justify-between gap-1 pb-1 flex-shrink-0 z-20 overflow-hidden">
-    <!-- 확장된 카테고리 영역 (많은 칩들이 시원하게 보임) -->
+    <!-- 확장된 카테고리 영역: 우측 버튼이 줄어들어 4~6개 이상의 칩이 시원하게 보임 -->
     <div id="filter-chip-container" class="flex-1 min-w-0 flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1 pr-1"></div>
 
-    <!-- 우측 제어 메뉴: 스와이프 가능한 슬라이딩 도크 (핵심 4개 우선 노출 + 옆으로 스와이프 시 추가 버튼) -->
-    <div class="flex-shrink-0 max-w-[144px] sm:max-w-[160px] overflow-x-auto no-scrollbar py-0.5 pl-0.5">
+    <!-- 우측 제어 메뉴: 4개 고정 너비(148px) 도크 (가사, 반복, 재생, 설정 우선 노출 + 옆으로 스와이프 시 셔플/정지/타이머 노출) -->
+    <div class="flex-shrink-0 w-[148px] overflow-x-auto no-scrollbar py-0.5 pl-0.5 border-l border-stone-200/50">
       <div class="flex items-center gap-1 w-max">
         <!-- 1. 가사 마이크 버튼 -->
-        <button id="btn-toggle-lyrics" class="w-8 h-8 rounded-full bg-white/95 text-stone-700 shadow-sm border border-stone-200 flex items-center justify-center text-xs active:scale-95 transition-all flex-shrink-0" title="가사 보기">
+        <button id="btn-toggle-lyrics" type="button" class="w-8 h-8 rounded-full bg-white text-stone-700 shadow-sm border border-stone-200 flex items-center justify-center text-xs active:scale-95 transition-all flex-shrink-0" title="가사 보기">
           <svg class="w-4 h-4 text-stone-700" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <circle cx="14" cy="7" r="4.2" stroke="currentColor" stroke-width="1.8"/>
             <path d="M11 7C11 8.65 12.35 10 14 10C15.65 10 17 8.65 17 7" stroke="currentColor" stroke-width="1.2"/>
@@ -267,34 +270,34 @@
         </button>
 
         <!-- 2. 반복 재생 모드 -->
-        <button id="btn-repeat-mode" class="w-8 h-8 rounded-full bg-white/95 text-stone-700 shadow-sm border border-stone-200 flex items-center justify-center text-xs active:scale-95 transition-all relative flex-shrink-0" title="반복 재생 모드">
+        <button id="btn-repeat-mode" type="button" class="w-8 h-8 rounded-full bg-white text-stone-700 shadow-sm border border-stone-200 flex items-center justify-center text-xs active:scale-95 transition-all relative flex-shrink-0" title="반복 재생 모드">
           <i id="repeat-icon" class="fa-solid fa-arrow-right text-[11px] text-stone-500"></i>
           <span id="repeat-badge" class="hidden absolute -top-1 -right-1 bg-amber-500 text-white rounded-full text-[8px] font-black w-3.5 h-3.5 flex items-center justify-center">1</span>
         </button>
 
         <!-- 3. 일시정지(⏸️) / 재생(▶) 토글 버튼 -->
-        <button id="btn-play-all" class="w-8 h-8 rounded-full bg-white/95 text-stone-700 shadow-sm border border-stone-200 flex items-center justify-center text-xs active:scale-95 transition-all flex-shrink-0" title="재생 / 일시정지">
+        <button id="btn-play-all" type="button" class="w-8 h-8 rounded-full bg-white text-stone-700 shadow-sm border border-stone-200 flex items-center justify-center text-xs active:scale-95 transition-all flex-shrink-0" title="재생 / 일시정지">
           <i id="play-all-icon" class="fa-solid fa-play text-[11px] ml-0.5"></i>
         </button>
 
         <!-- 4. 설정 버튼 -->
-        <button id="btn-open-settings" class="w-8 h-8 rounded-full bg-stone-200/80 text-stone-700 shadow-sm border border-stone-300/70 flex items-center justify-center text-xs active:scale-95 transition-all flex-shrink-0" title="설정">
+        <button id="btn-open-settings" type="button" class="w-8 h-8 rounded-full bg-stone-200 text-stone-700 shadow-sm border border-stone-300 flex items-center justify-center text-xs active:scale-95 transition-all flex-shrink-0" title="설정">
           <i class="fa-solid fa-gear"></i>
         </button>
 
-        <!-- [스와이프 시 나타나는 추가 제어 버튼들] -->
+        <!-- [옆으로 스와이프하면 나타나는 보조 제어 버튼들] -->
         <!-- 5. 랜덤 셔플 -->
-        <button id="btn-shuffle" class="w-8 h-8 rounded-full bg-white/90 text-stone-700 shadow-sm border border-stone-200 flex items-center justify-center text-xs active:scale-95 transition-all flex-shrink-0" title="랜덤 셔플">
+        <button id="btn-shuffle" type="button" class="w-8 h-8 rounded-full bg-white text-stone-700 shadow-sm border border-stone-200 flex items-center justify-center text-xs active:scale-95 transition-all flex-shrink-0" title="랜덤 셔플">
           <i class="fa-solid fa-shuffle"></i>
         </button>
 
         <!-- 6. 완전 정지(■) -->
-        <button id="btn-stop-all" class="w-8 h-8 rounded-full bg-white/90 text-stone-600 shadow-sm border border-stone-200 flex items-center justify-center text-xs active:scale-95 transition-all flex-shrink-0" title="완전 정지">
+        <button id="btn-stop-all" type="button" class="w-8 h-8 rounded-full bg-white text-stone-600 shadow-sm border border-stone-200 flex items-center justify-center text-xs active:scale-95 transition-all flex-shrink-0" title="완전 정지">
           <i class="fa-solid fa-stop"></i>
         </button>
 
         <!-- 7. 빠른 타이머 -->
-        <button id="btn-timer-quick" class="w-8 h-8 rounded-full bg-white/90 text-stone-700 shadow-sm border border-stone-200 flex items-center justify-center text-xs active:scale-95 transition-all relative flex-shrink-0" title="재생 타이머">
+        <button id="btn-timer-quick" type="button" class="w-8 h-8 rounded-full bg-white text-stone-700 shadow-sm border border-stone-200 flex items-center justify-center text-xs active:scale-95 transition-all relative flex-shrink-0" title="재생 타이머">
           <i class="fa-regular fa-clock text-[12px]"></i>
           <span id="quick-timer-badge" class="hidden absolute -top-1 -right-1 bg-amber-500 text-white rounded-full text-[8px] font-black px-1 h-3.5 flex items-center justify-center"></span>
         </button>
@@ -586,8 +589,8 @@
                     class="w-full p-2.5 text-xs rounded-lg border border-stone-200 bg-stone-50 focus:outline-none focus:bg-white font-medium resize-none overflow-hidden transition-all"></textarea>
         </div>
 
-        <!-- Submit Button: 수정 모드일 땐 눈에 띄는 앰버 저장 버튼, 저장 완료 시 초록색 피드백 -->
-        <button id="btn-submit-card" class="w-full py-2.5 rounded-xl bg-[#EFE8DC] hover:bg-[#E5DDCF] active:scale-95 text-stone-800 font-bold text-xs border border-[#DFD6C7] transition-all flex items-center justify-center gap-1.5 shadow-sm">
+        <!-- Submit Button: 수정 모드일 땐 눈에 띄는 앰버 저장 버튼 -->
+        <button type="button" id="btn-submit-card" class="w-full py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 active:scale-95 text-white font-black text-xs border border-amber-600 transition-all flex items-center justify-center gap-1.5 shadow-md cursor-pointer">
           <i id="submit-icon" class="fa-solid fa-plus text-xs"></i> 
           <span id="ui-btn-add">추가</span>
         </button>
@@ -1404,7 +1407,7 @@
       syncRecResult = [];
       btnSyncTap.disabled = true;
       btnSyncUndo.disabled = true;
-      curLineEl.textContent = '준비되면 [노래 재생 & 싱크 시작]을 누르세요';
+      curLineEl.textContent = '준비되면 시작을 누르세요';
       nextLineEl.textContent = `첫 줄: ${syncRecLines[0] || '-'}`;
       syncProgressEl.textContent = `0 / ${syncRecLines.length}`;
       syncModal.classList.remove('hidden');
@@ -1595,7 +1598,16 @@
       document.getElementById('tab-src-url').textContent = t.tabUrl;
       document.getElementById('input-yt-url').placeholder = t.inputYtPlaceholder;
       document.getElementById('input-stream-url').placeholder = t.inputStreamPlaceholder;
-      document.getElementById('ui-btn-add').textContent = editingCardId ? t.saveBtn : t.addBtn;
+      
+      // 수정 모드 상태에 맞게 버튼 라벨을 확실하게 동기화
+      if (editingCardId) {
+        document.getElementById('ui-btn-add').textContent = t.saveBtn;
+        document.getElementById('submit-icon').className = 'fa-solid fa-floppy-disk text-xs';
+      } else {
+        document.getElementById('ui-btn-add').textContent = t.addBtn;
+        document.getElementById('submit-icon').className = 'fa-solid fa-plus text-xs';
+      }
+
       document.getElementById('btn-cancel-edit').textContent = t.cancelEditBtn;
       document.getElementById('ui-label-category').textContent = t.categoryTitle;
       document.getElementById('ui-label-select-cat').textContent = t.categorySelectTitle;
@@ -2673,7 +2685,6 @@
 
       emojiInput.value = '';
       nameInput.value = '';
-      syncToFamilyCloud();
     });
 
     // 카테고리 순서 이동 및 편집 리스트 렌더링
@@ -2732,7 +2743,6 @@
             renderModalCategoryTags();
             updateCategorySelectOptions();
             renderAddModalCategoryBubbles();
-            syncToFamilyCloud();
           }
         });
 
@@ -2747,7 +2757,6 @@
             renderModalCategoryTags();
             updateCategorySelectOptions();
             renderAddModalCategoryBubbles();
-            syncToFamilyCloud();
           }
         });
 
@@ -2767,7 +2776,6 @@
           renderAddModalCategoryBubbles();
           renderPage();
           renderModalCardList();
-          syncToFamilyCloud();
         });
 
         // 삭제
@@ -2781,7 +2789,6 @@
           renderAddModalCategoryBubbles();
           renderPage();
           renderModalCardList();
-          syncToFamilyCloud();
         });
 
         container.appendChild(row);
@@ -2801,12 +2808,12 @@
         indicator.classList.remove('hidden');
       }
 
-      // 수정 중일 땐 단정한 디스켓(저장) 아이콘과 '수정사항 저장' 라벨
+      // 수정 모드: 앰버 버튼 + 디스켓(저장) 아이콘 + '수정사항 저장'
       document.getElementById('ui-btn-add').textContent = t.saveBtn;
       document.getElementById('submit-icon').className = 'fa-solid fa-floppy-disk text-xs';
       
       const submitBtn = document.getElementById('btn-submit-card');
-      submitBtn.className = 'w-full py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 active:scale-95 text-white font-extrabold text-xs shadow-md border border-amber-600 transition-all flex items-center justify-center gap-1.5';
+      submitBtn.className = 'w-full py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 active:scale-95 text-white font-black text-xs border border-amber-600 transition-all flex items-center justify-center gap-1.5 shadow-md cursor-pointer';
       
       document.getElementById('btn-cancel-edit').classList.remove('hidden');
 
@@ -2860,7 +2867,7 @@
       document.getElementById('submit-icon').className = 'fa-solid fa-plus text-xs';
       
       const submitBtn = document.getElementById('btn-submit-card');
-      submitBtn.className = 'w-full py-2.5 rounded-xl bg-[#EFE8DC] hover:bg-[#E5DDCF] active:scale-95 text-stone-800 font-bold text-xs border border-[#DFD6C7] transition-all flex items-center justify-center gap-1.5 shadow-sm';
+      submitBtn.className = 'w-full py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 active:scale-95 text-white font-black text-xs border border-amber-600 transition-all flex items-center justify-center gap-1.5 shadow-md cursor-pointer';
 
       document.getElementById('btn-cancel-edit').classList.add('hidden');
 
@@ -2901,10 +2908,14 @@
 
     document.getElementById('btn-cancel-edit').addEventListener('click', cancelEditMode);
 
-    document.getElementById('btn-submit-card').addEventListener('click', async () => {
+    document.getElementById('btn-submit-card').addEventListener('click', async (e) => {
+      e.preventDefault();
       const titleInput = document.getElementById('new-title');
       const title = titleInput.value.trim();
-      if (!title) return;
+      if (!title) {
+        titleInput.focus();
+        return;
+      }
 
       const authorInput = document.getElementById('new-author');
       const author = authorInput ? authorInput.value.trim() : '';
@@ -2991,7 +3002,7 @@
         }
         
         // 저장이 완료된 순간에만 초록색 완료 체크(✓) 피드백 노출
-        submitBtn.className = 'w-full py-2.5 rounded-xl bg-emerald-600 text-white font-extrabold text-xs shadow-md border border-emerald-700 transition-all flex items-center justify-center gap-1.5';
+        submitBtn.className = 'w-full py-2.5 rounded-xl bg-emerald-600 text-white font-extrabold text-xs shadow-md border border-emerald-700 transition-all flex items-center justify-center gap-1.5 cursor-pointer';
         submitIcon.className = 'fa-solid fa-check text-xs';
         submitText.textContent = t.saveSuccessBtn || '저장 완료!';
 
@@ -3000,8 +3011,7 @@
           renderPage();
           renderModalCardList();
           cancelEditMode();
-          syncToFamilyCloud();
-        }, 650);
+        }, 500);
 
       } else {
         cards.unshift(cardData);
@@ -3009,7 +3019,6 @@
         renderPage();
         renderModalCardList();
         cancelEditMode();
-        syncToFamilyCloud();
       }
     });
 
@@ -3051,7 +3060,6 @@
       saveLocalData();
       renderPage();
       renderModalCardList();
-      syncToFamilyCloud();
     }
 
     function renderModalCardList() {
@@ -3144,7 +3152,6 @@
             saveLocalData();
             renderPage();
             renderModalCardList();
-            syncToFamilyCloud();
           }
         });
 
@@ -3157,7 +3164,6 @@
             saveLocalData();
             renderPage();
             renderModalCardList();
-            syncToFamilyCloud();
           }
         });
 
@@ -3169,7 +3175,6 @@
           saveLocalData();
           renderPage();
           renderModalCardList();
-          syncToFamilyCloud();
         });
 
         item.appendChild(topRow);
@@ -3206,65 +3211,8 @@
       const val = document.getElementById('family-sync-key').value.trim();
       familySyncKey = val;
       localStorage.setItem('baby_family_sync_key', familySyncKey);
-
-      if (familySyncKey) {
-        startFamilyPolling();
-        fetchFromFamilyCloud();
-      } else {
-        if (cloudPollInterval) clearInterval(cloudPollInterval);
-      }
+      alert('패밀리 코드가 저장되었습니다.');
     });
-
-    async function syncToFamilyCloud() {
-      if (!familySyncKey) return;
-      try {
-        const cloudData = {
-          cards: cards.map(c => {
-            const clone = { ...c };
-            delete clone.audioBlobUrl;
-            return clone;
-          }),
-          categories,
-          cooldownSec,
-          updatedAt: Date.now()
-        };
-
-        await fetch(`https://api.counterapi.dev/v1/bebe_${encodeURIComponent(familySyncKey)}/up`, {
-          method: 'GET',
-          mode: 'no-cors'
-        }).catch(()=>{});
-
-        localStorage.setItem(`cloud_last_${familySyncKey}`, JSON.stringify(cloudData));
-      } catch (e) {}
-    }
-
-    async function fetchFromFamilyCloud() {
-      if (!familySyncKey) return;
-      try {
-        const cached = localStorage.getItem(`cloud_last_${familySyncKey}`);
-        if (cached) {
-          const parsed = JSON.parse(cached);
-          if (parsed && parsed.cards) {
-            mergeIncomingCards(parsed.cards);
-            if (parsed.categories) categories = parsed.categories;
-            if (parsed.cooldownSec) cooldownSec = parsed.cooldownSec;
-            saveLocalData();
-            renderFilterChips();
-            renderPage();
-            renderModalCategoryTags();
-            renderModalCardList();
-            renderAddModalCategoryBubbles();
-          }
-        }
-      } catch (e) {}
-    }
-
-    function startFamilyPolling() {
-      if (cloudPollInterval) clearInterval(cloudPollInterval);
-      cloudPollInterval = setInterval(() => {
-        if (familySyncKey) fetchFromFamilyCloud();
-      }, 5000);
-    }
 
     document.getElementById('btn-export-bundle').addEventListener('click', async () => {
       const exportCards = [];
@@ -3407,6 +3355,8 @@
       modalFilterCategory = 'all';
       selectedAddCategoryIds = [];
       localStorage.removeItem('baby_soundbook_vclean');
+      localStorage.removeItem('baby_soundbook_data');
+      localStorage.removeItem('baby_audio_cards');
       saveLocalData();
       renderFilterChips();
       renderPage();
@@ -3422,35 +3372,36 @@
       return (match && match[2].length === 11) ? match[2] : '';
     }
 
+    // 로컬 스토리지에 확실하게 즉시 영구 저장
     function saveLocalData() {
       const persistable = cards.map(c => {
         const clone = { ...c };
         if (clone.audioBlobUrl) delete clone.audioBlobUrl;
         return clone;
       });
-      localStorage.setItem('baby_soundbook_vclean', JSON.stringify({ 
+      const dataPayload = JSON.stringify({ 
         cards: persistable, 
         categories, 
         cooldownSec,
         repeatCountLimit 
-      }));
+      });
+      // 최신 메인 키에 저장
+      localStorage.setItem('baby_soundbook_vclean', dataPayload);
+      // 예전 키들도 함께 동기화하여 옛날 버전 로직이 덮어쓰지 못하도록 방어
+      localStorage.setItem('baby_soundbook_data', dataPayload);
     }
 
     function loadLocalData() {
-      const possibleKeys = ['baby_soundbook_vclean', 'baby_soundbook_data', 'baby_audio_cards'];
-      let loadedData = null;
+      // 최신 키를 무조건 1순위로 로드
+      let raw = localStorage.getItem('baby_soundbook_vclean');
+      if (!raw) raw = localStorage.getItem('baby_soundbook_data');
+      if (!raw) raw = localStorage.getItem('baby_audio_cards');
 
-      for (const k of possibleKeys) {
-        const raw = localStorage.getItem(k);
-        if (raw) {
-          try {
-            const parsed = JSON.parse(raw);
-            if (parsed && (Array.isArray(parsed.cards) || Array.isArray(parsed))) {
-              loadedData = parsed;
-              break;
-            }
-          } catch(e) {}
-        }
+      let loadedData = null;
+      if (raw) {
+        try {
+          loadedData = JSON.parse(raw);
+        } catch(e) {}
       }
 
       if (loadedData) {
@@ -3476,10 +3427,6 @@
       }
 
       familySyncKey = localStorage.getItem('baby_family_sync_key') || '';
-      if (familySyncKey) {
-        startFamilyPolling();
-      }
-
       const savedLang = localStorage.getItem('baby_ui_lang');
       setUiLanguage(savedLang || 'ko');
     }
